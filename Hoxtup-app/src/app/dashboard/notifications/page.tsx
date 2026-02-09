@@ -74,8 +74,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-heading">{t('title')}</h2>
+      <div className="flex justify-end">
         {unreadCount > 0 && (
           <Button variant="secondary" size="sm" onClick={markAllRead}>
             <CheckCheck className="size-4 mr-1" />

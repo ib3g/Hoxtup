@@ -22,7 +22,7 @@ export function Sidebar({ items }: SidebarProps) {
     <aside
       aria-label={t('nav.sidebar')}
       className={cn(
-        'hidden lg:flex flex-col h-screen sticky top-0 bg-immersive text-white transition-all duration-200',
+        'hidden lg:flex flex-col h-screen z-10 bg-immersive text-white transition-all duration-200',
         collapsed ? 'w-16' : 'w-60'
       )}
     >

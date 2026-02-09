@@ -4,6 +4,7 @@
     "title": "Profil",
     "firstName": "Prénom",
     "lastName": "Nom",
+    "fullName": "Nom complet",
     "email": "Email",
     "avatar": "Photo de profil"
   },
@@ -23,6 +24,7 @@
   "save": "Enregistrer",
   "saving": "Enregistrement...",
   "saved": "Enregistré",
+  "edit": "Modifier",
   "role": "Rôle",
   "preferences": {
     "title": "Préférences",

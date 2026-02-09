@@ -78,8 +78,7 @@ export default function PropertiesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-heading">{t('title')}</h2>
+      <div className="flex justify-end">
         <Button onClick={() => setSheetOpen(true)}>
           <Plus className="size-4 mr-2" />
           {t('list.addProperty')}

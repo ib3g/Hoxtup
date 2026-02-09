@@ -2,12 +2,15 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChevronLeft, ChevronRight, User, CalendarDays } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { PropertyColorDot } from '@/components/property-color-dot'
+import { TaskTypeIcon } from '@/components/task-type-icon'
+import { TaskDetailSheet } from '@/components/task-detail-sheet'
+import { ReservationDetailSheet } from '@/components/reservation-detail-sheet'
 import { cn } from '@/lib/utils'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
@@ -56,6 +59,10 @@ export default function CalendarPage() {
   const [reservations, setReservations] = useState<CalendarReservation[]>([])
   const [tasks, setTasks] = useState<CalendarTask[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
+  const [taskSheetOpen, setTaskSheetOpen] = useState(false)
+  const [selectedReservationId, setSelectedReservationId] = useState<string | null>(null)
+  const [reservationSheetOpen, setReservationSheetOpen] = useState(false)
 
   const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart])
   const weekDays = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart])
@@ -99,11 +106,10 @@ export default function CalendarPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <h2 className="text-heading">{t('title')}</h2>
+      <div className="flex justify-end flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <Select value={propertyFilter} onValueChange={setPropertyFilter}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-36 sm:w-48">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -121,12 +127,12 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-1 flex-wrap">
+        <div className="flex items-center gap-1">
           <Button variant="ghost" size="sm" onClick={() => setWeekStart(addDays(weekStart, -7))}>
             <ChevronLeft className="size-4" />
           </Button>
-          <span className="text-label min-w-[180px] text-center">
+          <span className="text-caption sm:text-label text-center">
             {weekStart.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} — {addDays(weekStart, 6).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setWeekStart(addDays(weekStart, 7))}>
@@ -145,7 +151,7 @@ export default function CalendarPage() {
             const co = new Date(r.checkOut)
             return isWithinRange(day, ci, co) || isSameDay(day, ci)
           })
-          const dayTasks = tasks.filter((t) => t.scheduledAt && isSameDay(new Date(t.scheduledAt), day))
+          const dayTasks = tasks.filter((tk) => tk.scheduledAt && isSameDay(new Date(tk.scheduledAt), day))
           const isToday = isSameDay(day, today)
 
           return (
@@ -165,31 +171,108 @@ export default function CalendarPage() {
 
               <div className="space-y-1">
                 {dayReservations.map((r) => (
-                  <div
-                    key={r.id}
-                    className="flex items-center gap-1 px-1.5 py-0.5 rounded text-micro bg-info/10 truncate"
-                  >
-                    <PropertyColorDot colorIndex={r.property.colorIndex} size="sm" />
-                    <span className="truncate">{r.guestName}</span>
-                  </div>
+                  <Popover key={r.id}>
+                    <PopoverTrigger asChild>
+                      <button className="w-full flex items-center gap-1 px-1.5 py-0.5 rounded text-micro bg-info/10 truncate text-left cursor-pointer hover:bg-info/20 transition-colors">
+                        <PropertyColorDot colorIndex={r.property.colorIndex} size="sm" />
+                        <span className="truncate">{r.guestName}</span>
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-64 p-3 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <PropertyColorDot colorIndex={r.property.colorIndex} size="md" />
+                        <div>
+                          <p className="text-caption font-medium">{t('reservation')}</p>
+                          <p className="text-micro text-muted-foreground">{r.property.name}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-micro">
+                        <div>
+                          <p className="text-muted-foreground">{t('guest')}</p>
+                          <p className="font-medium">{r.guestName}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">{t('status')}</p>
+                          <p className="font-medium">{r.status}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">{t('checkIn')}</p>
+                          <p className="font-medium">{new Date(r.checkIn).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">{t('checkOut')}</p>
+                          <p className="font-medium">{new Date(r.checkOut).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</p>
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="xs" className="w-full" onClick={() => { setSelectedReservationId(r.id); setReservationSheetOpen(true) }}>
+                        <ExternalLink className="size-3 mr-1" />
+                        {t('viewDetail')}
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
                 ))}
                 {dayTasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className={cn(
-                      'flex items-center gap-1 px-1.5 py-0.5 rounded text-micro truncate',
-                      task.status === 'COMPLETED' ? 'bg-success/10' : task.status === 'INCIDENT' ? 'bg-danger/10' : 'bg-warning/10',
-                    )}
-                  >
-                    <PropertyColorDot colorIndex={task.property.colorIndex} size="sm" />
-                    <span className="truncate">{task.title}</span>
-                  </div>
+                  <Popover key={task.id}>
+                    <PopoverTrigger asChild>
+                      <button
+                        className="w-full flex items-center gap-1 px-1.5 py-0.5 rounded text-micro truncate text-left cursor-pointer transition-colors bg-muted/50 hover:bg-muted"
+                      >
+                        <TaskTypeIcon type={task.type} size="sm" />
+                        <span className="truncate">{task.title}</span>
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-64 p-3 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <TaskTypeIcon type={task.type} size="md" />
+                        <div>
+                          <p className="text-caption font-medium">{task.title}</p>
+                          <p className="text-micro text-muted-foreground">
+                            <PropertyColorDot colorIndex={task.property.colorIndex} size="sm" className="inline-block mr-1" />
+                            {task.property.name}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-micro">
+                        <div>
+                          <p className="text-muted-foreground">{t('status')}</p>
+                          <p className="font-medium">{task.status}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">{t('task')}</p>
+                          <p className="font-medium">{task.type}</p>
+                        </div>
+                        {task.assignedUser && (
+                          <div className="col-span-2">
+                            <p className="text-muted-foreground">{t('assignedTo')}</p>
+                            <p className="font-medium">{task.assignedUser.name}</p>
+                          </div>
+                        )}
+                      </div>
+                      <Button variant="ghost" size="xs" className="w-full" onClick={() => { setSelectedTaskId(task.id); setTaskSheetOpen(true) }}>
+                        <ExternalLink className="size-3 mr-1" />
+                        {t('viewDetail')}
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
                 ))}
               </div>
             </div>
           )
         })}
       </div>
+
+      <TaskDetailSheet
+        taskId={selectedTaskId}
+        open={taskSheetOpen}
+        onOpenChange={setTaskSheetOpen}
+        onTaskUpdated={fetchData}
+      />
+      <ReservationDetailSheet
+        reservationId={selectedReservationId}
+        open={reservationSheetOpen}
+        onOpenChange={setReservationSheetOpen}
+        onReservationUpdated={fetchData}
+      />
     </div>
   )
 }

@@ -70,7 +70,13 @@
     "createTitle": "Nouvelle tâche",
     "editTitle": "Modifier la tâche",
     "title": "Titre",
-    "titlePlaceholder": "ex: Ménage après départ",
+    "titlePlaceholder": "Sélectionner un titre",
+    "titleOptions": {
+      "cleaningAfterDeparture": "Ménage après départ",
+      "cleaningBeforeArrival": "Ménage avant arrivée",
+      "generalCleaning": "Ménage général",
+      "quickCleaning": "Ménage rapide"
+    },
     "description": "Description",
     "descriptionPlaceholder": "Détails de la tâche...",
     "type": "Type",
@@ -89,5 +95,12 @@
     }
   },
   "todayCount": "{{count}} tâche(s) aujourd'hui",
-  "inProgressCount": "{{count}} en cours"
+  "inProgressCount": "{{count}} en cours",
+  "edit": "Modifier",
+  "delete": "Supprimer",
+  "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette tâche ?",
+  "deleteDescription": "La tâche \"{{title}}\" sera supprimée définitivement.",
+  "deleteCancel": "Annuler",
+  "deleteSuccess": "Tâche supprimée",
+  "updating": "Mise à jour..."
 }

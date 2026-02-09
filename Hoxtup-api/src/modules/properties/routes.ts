@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { requireAuth, type AuthenticatedRequest } from '../../common/middleware/auth.js'
-import { getTenantDb } from '../../config/database.js'
+import { prisma } from '../../config/database.js'
 import { createPropertySchema, updatePropertySchema } from './schema.js'
 import { createProperty, listProperties, getProperty, updateProperty, archiveProperty, reactivateProperty } from './service.js'
 import { logger } from '../../config/logger.js'
@@ -11,8 +11,7 @@ router.get('/', requireAuth, async (req, res) => {
   const authReq = req as AuthenticatedRequest
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    const properties = await listProperties(db as never, authReq.organizationId)
+    const properties = await listProperties(prisma, authReq.organizationId)
     res.json(properties)
   } catch (err) {
     logger.error({ err, organizationId: authReq.organizationId }, 'Failed to list properties')
@@ -41,8 +40,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    const property = await createProperty(db as never, authReq.organizationId, parsed.data)
+    const property = await createProperty(prisma, authReq.organizationId, parsed.data)
 
     res.status(201).json(property)
   } catch (err) {
@@ -61,8 +59,7 @@ router.get('/:id', requireAuth, async (req, res) => {
   const id = req.params.id as string
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    const property = await getProperty(db as never, authReq.organizationId, id)
+    const property = await getProperty(prisma, authReq.organizationId, id)
 
     if (!property) {
       res.status(404).json({
@@ -103,8 +100,7 @@ router.patch('/:id', requireAuth, async (req, res) => {
   }
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    const property = await updateProperty(db as never, authReq.organizationId, id, parsed.data)
+    const property = await updateProperty(prisma, authReq.organizationId, id, parsed.data)
     res.json(property)
   } catch (err) {
     logger.error({ err, id }, 'Failed to update property')
@@ -122,8 +118,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
   const id = req.params.id as string
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    await archiveProperty(db as never, authReq.organizationId, id)
+    await archiveProperty(prisma, authReq.organizationId, id)
     res.status(204).end()
   } catch (err) {
     logger.error({ err, id }, 'Failed to archive property')
@@ -141,8 +136,7 @@ router.patch('/:id/reactivate', requireAuth, async (req, res) => {
   const id = req.params.id as string
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    const property = await reactivateProperty(db as never, authReq.organizationId, id)
+    const property = await reactivateProperty(prisma, authReq.organizationId, id)
     res.json(property)
   } catch (err) {
     logger.error({ err, id }, 'Failed to reactivate property')

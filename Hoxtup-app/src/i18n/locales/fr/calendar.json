@@ -12,6 +12,12 @@
   "allProperties": "Toutes les propriétés",
   "reservation": "Réservation",
   "task": "Tâche",
+  "viewDetail": "Voir le détail",
+  "guest": "Client",
+  "checkIn": "Arrivée",
+  "checkOut": "Départ",
+  "status": "Statut",
+  "assignedTo": "Assignée à",
   "days": {
     "mon": "Lun",
     "tue": "Mar",

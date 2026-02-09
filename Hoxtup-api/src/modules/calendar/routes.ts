@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { requireAuth, type AuthenticatedRequest } from '../../common/middleware/auth.js'
-import { getTenantDb } from '../../config/database.js'
+import { prisma } from '../../config/database.js'
 import { logger } from '../../config/logger.js'
 
 const router = Router()
@@ -22,12 +22,11 @@ router.get('/', requireAuth, async (req, res) => {
   }
 
   try {
-    const db = getTenantDb(authReq.organizationId)
     const startDate = new Date(start)
     const endDate = new Date(end)
 
     const [reservations, tasks] = await Promise.all([
-      db.reservation.findMany({
+      prisma.reservation.findMany({
         where: {
           organizationId: authReq.organizationId,
           ...(propertyId && { propertyId }),
@@ -36,7 +35,7 @@ router.get('/', requireAuth, async (req, res) => {
         },
         include: { property: { select: { id: true, name: true, colorIndex: true } } },
       }),
-      db.task.findMany({
+      prisma.task.findMany({
         where: {
           organizationId: authReq.organizationId,
           ...(propertyId && { propertyId }),

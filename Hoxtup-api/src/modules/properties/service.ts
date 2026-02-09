@@ -2,6 +2,11 @@ import type { PrismaClient } from '../../generated/prisma/client.js'
 import type { CreatePropertyInput, UpdatePropertyInput } from './schema.js'
 import { logger } from '../../config/logger.js'
 
+async function getNextColorIndex(db: PrismaClient, organizationId: string): Promise<number> {
+  const count = await db.property.count({ where: { organizationId } })
+  return count % 5
+}
+
 export async function listProperties(db: PrismaClient, organizationId: string) {
   return db.property.findMany({
     where: { organizationId },
@@ -16,13 +21,15 @@ export async function createProperty(
 ) {
   logger.info({ organizationId, name: input.name }, 'Creating property')
 
+  const colorIndex = input.colorIndex ?? await getNextColorIndex(db, organizationId)
+
   const property = await db.property.create({
     data: {
       organizationId,
       name: input.name,
       address: input.address,
       type: input.type as 'APARTMENT' | 'HOUSE' | 'VILLA' | 'STUDIO' | 'ROOM' | 'OTHER',
-      colorIndex: input.colorIndex,
+      colorIndex,
       capacity: input.capacity,
       notes: input.notes ?? null,
     },

@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { PropertyColorDot } from '@/components/property-color-dot'
 import { ReservationFormSheet } from '@/components/reservation-form-sheet'
+import { ReservationDetailSheet } from '@/components/reservation-detail-sheet'
 import { toast } from 'sonner'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
@@ -39,6 +40,8 @@ export default function ReservationsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [propertyFilter, setPropertyFilter] = useState<string>('all')
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [detailId, setDetailId] = useState<string | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
 
   const fetchData = useCallback(() => {
     setLoading(true)
@@ -98,8 +101,7 @@ export default function ReservationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-heading">{t('title')}</h2>
+      <div className="flex justify-end">
         <Button onClick={() => setSheetOpen(true)}>
           <Plus className="size-4 mr-2" />
           {t('create')}
@@ -150,7 +152,7 @@ export default function ReservationsPage() {
       ) : (
         <div className="space-y-3">
           {reservations.map((res) => (
-            <Card key={res.id}>
+            <Card key={res.id} className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => { setDetailId(res.id); setDetailOpen(true) }}>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <PropertyColorDot colorIndex={res.property.colorIndex} size="lg" />
@@ -188,6 +190,12 @@ export default function ReservationsPage() {
         onOpenChange={setSheetOpen}
         onSuccess={handleCreated}
         properties={properties}
+      />
+      <ReservationDetailSheet
+        reservationId={detailId}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        onReservationUpdated={fetchData}
       />
     </div>
   )

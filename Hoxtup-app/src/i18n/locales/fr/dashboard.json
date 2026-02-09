@@ -20,8 +20,10 @@
     "unassigned": "Non assignées"
   },
   "todayTasks": "Tâches du jour",
+  "weekTasks": "Tâches de la semaine",
   "viewAllTasks": "Voir toutes les tâches",
   "noTasksToday": "Aucune tâche planifiée aujourd'hui",
+  "noTasksWeek": "Aucune tâche planifiée cette semaine",
   "quickActions": {
     "title": "Actions rapides",
     "newTask": "Nouvelle tâche",

@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Pencil, Archive, RotateCcw, MapPin, Users, CalendarDays, FileText, Plus, Trash2, Link2, CheckCircle, XCircle } from 'lucide-react'
+import { ArrowLeft, Pencil, Archive, RotateCcw, MapPin, Users, CalendarDays, FileText, Plus, Trash2, Link2, CheckCircle, XCircle, ClipboardList } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -17,8 +18,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { PropertyColorDot } from '@/components/property-color-dot'
+import { TASK_STATUS_COLORS } from '@/lib/task-constants'
 import { PropertyFormSheet } from '@/components/property-form-sheet'
+import { TaskDetailSheet } from '@/components/task-detail-sheet'
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
 
@@ -34,7 +38,14 @@ interface Property {
   createdAt: string
 }
 
-type Tab = 'info' | 'reservations' | 'ical' | 'tasks'
+interface TaskItem {
+  id: string; title: string; type: string; status: string; scheduledAt: string | null
+  assignedUser: { id: string; name: string } | null
+}
+
+interface ReservationItem {
+  id: string; guestName: string; checkIn: string; checkOut: string; status: string
+}
 
 export default function PropertyDetailPage() {
   const { t } = useTranslation('properties')
@@ -44,23 +55,31 @@ export default function PropertyDetailPage() {
 
   const [property, setProperty] = useState<Property | null>(null)
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<Tab>('info')
   const [editOpen, setEditOpen] = useState(false)
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false)
   const [archiving, setArchiving] = useState(false)
+  const [tasks, setTasks] = useState<TaskItem[]>([])
+  const [reservations, setReservations] = useState<ReservationItem[]>([])
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
+  const [taskSheetOpen, setTaskSheetOpen] = useState(false)
 
   const fetchProperty = useCallback(() => {
     setLoading(true)
-    fetch(`${API_URL}/properties/${id}`, { credentials: 'include' })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data: Property | null) => setProperty(data))
-      .catch(() => setProperty(null))
+    Promise.all([
+      fetch(`${API_URL}/properties/${id}`, { credentials: 'include' }).then((r) => r.ok ? r.json() : null),
+      fetch(`${API_URL}/tasks?propertyId=${id}`, { credentials: 'include' }).then((r) => r.ok ? r.json() : []),
+      fetch(`${API_URL}/reservations?propertyId=${id}`, { credentials: 'include' }).then((r) => r.ok ? r.json() : []),
+    ])
+      .then(([prop, taskData, resData]: [Property | null, TaskItem[], ReservationItem[]]) => {
+        setProperty(prop)
+        setTasks(taskData)
+        setReservations(resData)
+      })
+      .catch(() => { setProperty(null); setTasks([]); setReservations([]) })
       .finally(() => setLoading(false))
   }, [id])
 
-  useEffect(() => {
-    fetchProperty()
-  }, [fetchProperty])
+  useEffect(() => { fetchProperty() }, [fetchProperty])
 
   async function handleArchive() {
     setArchiving(true)
@@ -99,8 +118,11 @@ export default function PropertyDetailPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-48 rounded-lg" />
+        <Skeleton className="h-24 rounded-lg" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Skeleton className="h-48 rounded-lg" />
+          <Skeleton className="h-48 rounded-lg" />
+        </div>
       </div>
     )
   }
@@ -119,144 +141,129 @@ export default function PropertyDetailPage() {
 
   const isArchived = !!property.archivedAt
 
-  const tabs: { key: Tab; label: string }[] = [
-    { key: 'info', label: t('detail.tabs.info') },
-    { key: 'reservations', label: t('detail.tabs.reservations') },
-    { key: 'ical', label: t('detail.tabs.ical') },
-    { key: 'tasks', label: t('detail.tabs.tasks') },
-  ]
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard/properties')}>
-          <ArrowLeft className="size-4" />
-        </Button>
-        <PropertyColorDot colorIndex={property.colorIndex} size="lg" />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h2 className="text-heading truncate">{property.name}</h2>
-            {isArchived && (
-              <Badge variant="secondary">{t('status.archived')}</Badge>
-            )}
-          </div>
-          <p className="text-caption text-muted-foreground truncate">{property.address}</p>
-        </div>
-      </div>
-
-      <div className="flex gap-2">
-        {!isArchived && (
-          <>
-            <Button variant="secondary" size="sm" onClick={() => setEditOpen(true)}>
-              <Pencil className="size-4 mr-1" />
-              {t('detail.actions.edit')}
-            </Button>
-            <Button variant="destructive" size="sm" onClick={() => setArchiveDialogOpen(true)}>
-              <Archive className="size-4 mr-1" />
-              {t('detail.actions.archive')}
-            </Button>
-          </>
-        )}
-        {isArchived && (
-          <Button variant="secondary" size="sm" onClick={handleReactivate}>
-            <RotateCcw className="size-4 mr-1" />
-            {t('detail.actions.reactivate')}
-          </Button>
-        )}
-      </div>
-
-      <div className="flex border-b">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 text-label border-b-2 transition-colors ${
-              activeTab === tab.key
-                ? 'border-brand-primary text-brand-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {activeTab === 'info' && (
-        <Card>
-          <CardContent className="p-5 space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="flex items-start gap-3">
-                <FileText className="size-4 mt-0.5 text-muted-foreground shrink-0" />
-                <div>
-                  <p className="text-micro text-muted-foreground">{t('detail.info.type')}</p>
-                  <p className="text-label">{t(`type.${property.type.toLowerCase()}`)}</p>
-                </div>
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <PropertyColorDot colorIndex={property.colorIndex} size="lg" />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-heading truncate">{property.name}</h2>
+                {isArchived && <Badge variant="secondary">{t('status.archived')}</Badge>}
               </div>
-
-              <div className="flex items-start gap-3">
-                <MapPin className="size-4 mt-0.5 text-muted-foreground shrink-0" />
-                <div>
-                  <p className="text-micro text-muted-foreground">{t('detail.info.address')}</p>
-                  <p className="text-label">{property.address}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <Users className="size-4 mt-0.5 text-muted-foreground shrink-0" />
-                <div>
-                  <p className="text-micro text-muted-foreground">{t('detail.info.capacity')}</p>
-                  <p className="text-label">{property.capacity}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <CalendarDays className="size-4 mt-0.5 text-muted-foreground shrink-0" />
-                <div>
-                  <p className="text-micro text-muted-foreground">{t('detail.info.createdAt')}</p>
-                  <p className="text-label">
-                    {new Date(property.createdAt).toLocaleDateString('fr-FR', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </p>
-                </div>
-              </div>
+              <p className="text-caption text-muted-foreground truncate">{property.address}</p>
             </div>
+            <div className="flex gap-2 shrink-0">
+              {!isArchived && (
+                <>
+                  <Button variant="ghost" size="xs" onClick={() => setEditOpen(true)}>
+                    <Pencil className="size-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="xs" onClick={() => setArchiveDialogOpen(true)}>
+                    <Archive className="size-3.5" />
+                  </Button>
+                </>
+              )}
+              {isArchived && (
+                <Button variant="secondary" size="xs" onClick={handleReactivate}>
+                  <RotateCcw className="size-3.5 mr-1" />
+                  {t('detail.actions.reactivate')}
+                </Button>
+              )}
+            </div>
+          </div>
 
-            {property.notes ? (
-              <div className="pt-3 border-t">
-                <p className="text-micro text-muted-foreground mb-1">{t('detail.info.notes')}</p>
-                <p className="text-body">{property.notes}</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-5 pt-4 border-t">
+            <div>
+              <p className="text-micro text-muted-foreground">{t('detail.info.type')}</p>
+              <p className="text-caption font-medium">{t(`type.${property.type.toLowerCase()}`)}</p>
+            </div>
+            <div>
+              <p className="text-micro text-muted-foreground">{t('detail.info.capacity')}</p>
+              <p className="text-caption font-medium">{property.capacity}</p>
+            </div>
+            <div>
+              <p className="text-micro text-muted-foreground">{t('detail.info.createdAt')}</p>
+              <p className="text-caption font-medium">
+                {new Date(property.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </p>
+            </div>
+            <div>
+              <p className="text-micro text-muted-foreground">{t('detail.info.notes')}</p>
+              <p className="text-caption font-medium truncate">{property.notes || '—'}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardContent className="p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CalendarDays className="size-4 text-muted-foreground" />
+                <h3 className="text-label">{t('detail.upcomingReservations')}</h3>
               </div>
+              <Badge variant="secondary">{reservations.length}</Badge>
+            </div>
+            {reservations.length === 0 ? (
+              <p className="text-caption text-muted-foreground py-4 text-center">{t('detail.noReservations')}</p>
             ) : (
-              <div className="pt-3 border-t">
-                <p className="text-caption text-muted-foreground">{t('detail.info.noNotes')}</p>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {reservations.slice(0, 8).map((r) => (
+                  <div key={r.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/50">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-caption font-medium truncate">{r.guestName}</p>
+                      <p className="text-micro text-muted-foreground">
+                        {new Date(r.checkIn).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} → {new Date(r.checkOut).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                      </p>
+                    </div>
+                    <Badge variant="secondary" className="text-micro shrink-0">{r.status}</Badge>
+                  </div>
+                ))}
               </div>
             )}
           </CardContent>
         </Card>
-      )}
 
-      {activeTab === 'reservations' && (
         <Card>
-          <CardContent className="p-5 text-center text-muted-foreground">
-            <p className="text-body">{t('detail.tabs.reservations')} — {t('empty.description')}</p>
+          <CardContent className="p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ClipboardList className="size-4 text-muted-foreground" />
+                <h3 className="text-label">{t('detail.recentTasks')}</h3>
+              </div>
+              <Badge variant="secondary">{tasks.length}</Badge>
+            </div>
+            {tasks.length === 0 ? (
+              <p className="text-caption text-muted-foreground py-4 text-center">{t('detail.noTasks')}</p>
+            ) : (
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {tasks.slice(0, 8).map((task) => (
+                  <button key={task.id} onClick={() => { setSelectedTaskId(task.id); setTaskSheetOpen(true) }} className="w-full text-left">
+                    <div className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/50 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-caption font-medium truncate">{task.title}</p>
+                        <p className="text-micro text-muted-foreground">
+                          {task.scheduledAt ? new Date(task.scheduledAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—'}
+                          {task.assignedUser && ` · ${task.assignedUser.name}`}
+                        </p>
+                      </div>
+                      <Badge className={cn('text-micro shrink-0', TASK_STATUS_COLORS[task.status] ?? 'bg-muted')}>
+                        {task.status}
+                      </Badge>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
-      )}
+      </div>
 
-      {activeTab === 'ical' && (
-        <ICalTab propertyId={property.id} />
-      )}
-
-      {activeTab === 'tasks' && (
-        <Card>
-          <CardContent className="p-5 text-center text-muted-foreground">
-            <p className="text-body">{t('detail.tabs.tasks')} — {t('empty.description')}</p>
-          </CardContent>
-        </Card>
-      )}
+      <ICalTab propertyId={property.id} />
 
       <PropertyFormSheet
         open={editOpen}
@@ -283,6 +290,13 @@ export default function PropertyDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <TaskDetailSheet
+        taskId={selectedTaskId}
+        open={taskSheetOpen}
+        onOpenChange={setTaskSheetOpen}
+        onTaskUpdated={fetchProperty}
+      />
     </div>
   )
 }

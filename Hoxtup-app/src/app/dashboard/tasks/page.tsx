@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { Plus, ClipboardList } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -10,9 +9,12 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { PropertyColorDot } from '@/components/property-color-dot'
+import { TaskTypeIcon } from '@/components/task-type-icon'
 import { TaskFormSheet } from '@/components/task-form-sheet'
+import { TaskDetailSheet } from '@/components/task-detail-sheet'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { TASK_STATUS_COLORS, TASK_STATUS_CARD_STYLES, taskStatusKey } from '@/lib/task-constants'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
 
@@ -30,14 +32,6 @@ interface Task {
   createdAt: string
 }
 
-const STATUS_STYLES: Record<string, string> = {
-  PENDING_VALIDATION: 'border-l-warning bg-warning/5',
-  TODO: 'border-l-brand-primary',
-  IN_PROGRESS: 'border-l-cta',
-  COMPLETED: 'border-l-success opacity-60',
-  INCIDENT: 'border-l-danger bg-danger/5',
-  CANCELLED: 'border-l-muted-foreground opacity-40',
-}
 
 export default function TasksPage() {
   const { t } = useTranslation('tasks')
@@ -47,6 +41,8 @@ export default function TasksPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [propertyFilter, setPropertyFilter] = useState<string>('all')
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [detailTaskId, setDetailTaskId] = useState<string | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
 
   const fetchData = useCallback(() => {
     setLoading(true)
@@ -74,41 +70,7 @@ export default function TasksPage() {
     toast.success(t('form.success.created'))
   }
 
-  async function handleStatusChange(taskId: string, newStatus: string) {
-    await fetch(`${API_URL}/tasks/${taskId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ status: newStatus }),
-    })
-    fetchData()
-  }
 
-  function statusKey(s: string) {
-    const map: Record<string, string> = {
-      PENDING_VALIDATION: 'pendingValidation',
-      TODO: 'todo',
-      IN_PROGRESS: 'inProgress',
-      COMPLETED: 'completed',
-      INCIDENT: 'incident',
-      FUSION_SUGGESTED: 'fusionSuggested',
-      CANCELLED: 'cancelled',
-    }
-    return map[s] ?? s
-  }
-
-  function typeKey(t: string) {
-    const map: Record<string, string> = {
-      CLEANING: 'cleaning',
-      MAINTENANCE: 'maintenance',
-      INSPECTION: 'inspection',
-      CHECK_IN: 'checkIn',
-      CHECK_OUT: 'checkOut',
-      TURNOVER: 'turnover',
-      OTHER: 'other',
-    }
-    return map[t] ?? t
-  }
 
   if (loading) {
     return (
@@ -126,8 +88,7 @@ export default function TasksPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-heading">{t('title')}</h2>
+      <div className="flex justify-end">
         <Button onClick={() => setSheetOpen(true)}>
           <Plus className="size-4 mr-2" />
           {t('create')}
@@ -136,7 +97,7 @@ export default function TasksPage() {
 
       <div className="flex flex-wrap gap-2">
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-45">
             <SelectValue placeholder={t('filterByStatus')} />
           </SelectTrigger>
           <SelectContent>
@@ -179,44 +140,30 @@ export default function TasksPage() {
           </Button>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {tasks.map((task) => (
-            <Card key={task.id} className={cn('border-l-4', STATUS_STYLES[task.status] ?? '')}>
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <PropertyColorDot colorIndex={task.property.colorIndex} size="md" className="mt-1" />
+            <button
+              key={task.id}
+              onClick={() => { setDetailTaskId(task.id); setDetailOpen(true) }}
+              className="w-full text-left"
+            >
+              <Card className={cn('border-l-4 hover:bg-muted/50 transition-colors cursor-pointer', TASK_STATUS_CARD_STYLES[task.status] ?? '')}>
+                <CardContent className="px-3 py-2.5 flex items-center gap-2.5">
+                  <TaskTypeIcon type={task.type} size="sm" />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Link href={`/dashboard/tasks/${task.id}`} className={cn('text-label hover:underline', task.status === 'COMPLETED' && 'line-through')}>{task.title}</Link>
-                      <Badge variant="secondary" className="text-micro">{t(`type.${typeKey(task.type)}`)}</Badge>
-                      <Badge variant="outline" className="text-micro">{t(`status.${statusKey(task.status)}`)}</Badge>
-                    </div>
-                    <div className="flex items-center gap-3 mt-1 text-micro text-muted-foreground">
-                      <span>{task.property.name}</span>
-                      {task.assignedUser && <span>→ {task.assignedUser.name}</span>}
-                      {task.scheduledAt && <span>{new Date(task.scheduledAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>}
-                    </div>
+                    <p className={cn('text-sm font-medium truncate', task.status === 'COMPLETED' && 'line-through opacity-60')}>{task.title}</p>
+                    <p className="text-micro text-muted-foreground truncate">
+                      {task.property.name}
+                      {task.assignedUser && ` · ${task.assignedUser.name}`}
+                      {task.scheduledAt && ` · ${new Date(task.scheduledAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}`}
+                    </p>
                   </div>
-                  <div className="flex gap-1 shrink-0">
-                    {task.status === 'PENDING_VALIDATION' && (
-                      <Button size="sm" variant="secondary" onClick={() => handleStatusChange(task.id, 'TODO')}>
-                        {t('actions.validate')}
-                      </Button>
-                    )}
-                    {task.status === 'TODO' && (
-                      <Button size="sm" onClick={() => handleStatusChange(task.id, 'IN_PROGRESS')}>
-                        {t('actions.start')}
-                      </Button>
-                    )}
-                    {task.status === 'IN_PROGRESS' && (
-                      <Button size="sm" onClick={() => handleStatusChange(task.id, 'COMPLETED')}>
-                        {t('actions.complete')}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  <Badge className={cn('text-micro shrink-0 border', TASK_STATUS_COLORS[task.status] ?? '')}>
+                    {t(`status.${taskStatusKey(task.status)}`)}
+                  </Badge>
+                </CardContent>
+              </Card>
+            </button>
           ))}
         </div>
       )}
@@ -226,6 +173,12 @@ export default function TasksPage() {
         onOpenChange={setSheetOpen}
         onSuccess={handleCreated}
         properties={properties}
+      />
+      <TaskDetailSheet
+        taskId={detailTaskId}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        onTaskUpdated={fetchData}
       />
     </div>
   )

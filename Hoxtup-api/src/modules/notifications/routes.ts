@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { requireAuth, type AuthenticatedRequest } from '../../common/middleware/auth.js'
-import { getTenantDb } from '../../config/database.js'
+import { prisma } from '../../config/database.js'
 import { logger } from '../../config/logger.js'
 
 const router = Router()
@@ -9,8 +9,7 @@ router.get('/', requireAuth, async (req, res) => {
   const authReq = req as AuthenticatedRequest
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    const notifications = await db.notification.findMany({
+    const notifications = await prisma.notification.findMany({
       where: { organizationId: authReq.organizationId, userId: authReq.user.id },
       orderBy: { createdAt: 'desc' },
       take: 50,
@@ -31,8 +30,7 @@ router.get('/unread-count', requireAuth, async (req, res) => {
   const authReq = req as AuthenticatedRequest
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    const count = await db.notification.count({
+    const count = await prisma.notification.count({
       where: { organizationId: authReq.organizationId, userId: authReq.user.id, readAt: null },
     })
     res.json({ count })
@@ -52,8 +50,7 @@ router.patch('/:id/read', requireAuth, async (req, res) => {
   const id = req.params.id as string
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    const notification = await db.notification.update({
+    const notification = await prisma.notification.update({
       where: { id, organizationId: authReq.organizationId, userId: authReq.user.id },
       data: { readAt: new Date() },
     })
@@ -73,8 +70,7 @@ router.patch('/read-all', requireAuth, async (req, res) => {
   const authReq = req as AuthenticatedRequest
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    await db.notification.updateMany({
+    await prisma.notification.updateMany({
       where: { organizationId: authReq.organizationId, userId: authReq.user.id, readAt: null },
       data: { readAt: new Date() },
     })

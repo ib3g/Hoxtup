@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { requireAuth, type AuthenticatedRequest } from '../../common/middleware/auth.js'
-import { getTenantDb } from '../../config/database.js'
+import { prisma } from '../../config/database.js'
 import { listMembers } from './service.js'
 import { logger } from '../../config/logger.js'
 
@@ -10,8 +10,7 @@ router.get('/', requireAuth, async (req, res) => {
   const authReq = req as AuthenticatedRequest
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    const members = await listMembers(db as never, authReq.organizationId)
+    const members = await listMembers(prisma, authReq.organizationId)
     res.json(members)
   } catch (err) {
     logger.error({ err, organizationId: authReq.organizationId }, 'Failed to list members')
@@ -40,8 +39,7 @@ router.patch('/:id/role', requireAuth, async (req, res) => {
   }
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    const member = await db.member.update({
+    const member = await prisma.member.update({
       where: { id, organizationId: authReq.organizationId },
       data: { role },
       include: { user: { select: { id: true, name: true, email: true } } },
@@ -63,8 +61,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
   const id = req.params.id as string
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    await db.member.delete({
+    await prisma.member.delete({
       where: { id, organizationId: authReq.organizationId },
     })
     res.status(204).end()

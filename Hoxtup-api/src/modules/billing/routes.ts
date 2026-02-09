@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { requireAuth, type AuthenticatedRequest } from '../../common/middleware/auth.js'
-import { getTenantDb } from '../../config/database.js'
+import { prisma } from '../../config/database.js'
 import { logger } from '../../config/logger.js'
 
 const router = Router()
@@ -21,13 +21,12 @@ router.get('/', requireAuth, async (req, res) => {
   const authReq = req as AuthenticatedRequest
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    const org = await db.organization.findUnique({
+    const org = await prisma.organization.findUnique({
       where: { id: authReq.organizationId },
       select: { id: true, name: true, createdAt: true },
     })
 
-    const propertyCount = await db.property.count({
+    const propertyCount = await prisma.property.count({
       where: { organizationId: authReq.organizationId, archivedAt: null },
     })
 

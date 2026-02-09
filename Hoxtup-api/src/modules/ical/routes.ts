@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { requireAuth, type AuthenticatedRequest } from '../../common/middleware/auth.js'
-import { getTenantDb } from '../../config/database.js'
+import { prisma } from '../../config/database.js'
 import { createICalSourceSchema } from './schema.js'
 import { createICalSource, listICalSources, deleteICalSource } from './service.js'
 import { logger } from '../../config/logger.js'
@@ -12,8 +12,7 @@ router.get('/', requireAuth, async (req, res) => {
   const propertyId = req.params.propertyId as string
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    const sources = await listICalSources(db as never, authReq.organizationId, propertyId)
+    const sources = await listICalSources(prisma, authReq.organizationId, propertyId)
     res.json(sources)
   } catch (err) {
     logger.error({ err, propertyId }, 'Failed to list iCal sources')
@@ -53,8 +52,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    const source = await createICalSource(db as never, authReq.organizationId, propertyId, parsed.data)
+    const source = await createICalSource(prisma, authReq.organizationId, propertyId, parsed.data)
 
     res.status(201).json(source)
   } catch (err) {
@@ -74,8 +72,7 @@ router.delete('/:sourceId', requireAuth, async (req, res) => {
   const sourceId = req.params.sourceId as string
 
   try {
-    const db = getTenantDb(authReq.organizationId)
-    await deleteICalSource(db as never, authReq.organizationId, propertyId, sourceId)
+    await deleteICalSource(prisma, authReq.organizationId, propertyId, sourceId)
     res.status(204).end()
   } catch (err) {
     logger.error({ err, propertyId, sourceId }, 'Failed to delete iCal source')

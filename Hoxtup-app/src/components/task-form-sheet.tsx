@@ -2,20 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod/v4'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { DateTimePicker } from '@/components/ui/date-time-picker'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { PropertyColorDot } from '@/components/property-color-dot'
+import { TASK_TYPE_KEY_MAP } from '@/lib/task-constants'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
-
-const TASK_TYPES = ['CLEANING', 'MAINTENANCE', 'INSPECTION', 'CHECK_IN', 'CHECK_OUT', 'TURNOVER', 'OTHER'] as const
 
 interface Property { id: string; name: string; colorIndex: number }
 interface TeamMember { id: string; userId: string; role: string; user: { id: string; name: string; email: string } }
@@ -31,6 +27,12 @@ export function TaskFormSheet({ open, onOpenChange, onSuccess, properties }: Tas
   const { t } = useTranslation('tasks')
   const [serverError, setServerError] = useState<string | null>(null)
   const [members, setMembers] = useState<TeamMember[]>([])
+  const [propertyId, setPropertyId] = useState('')
+  const [taskType, setTaskType] = useState('CLEANING')
+  const [assigneeId, setAssigneeId] = useState('')
+  const [scheduledAt, setScheduledAt] = useState('')
+  const [description, setDescription] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     if (open) {
@@ -38,46 +40,46 @@ export function TaskFormSheet({ open, onOpenChange, onSuccess, properties }: Tas
         .then((r) => r.ok ? r.json() : [])
         .then(setMembers)
         .catch(() => setMembers([]))
+    } else {
+      setPropertyId('')
+      setTaskType('CLEANING')
+      setAssigneeId('')
+      setScheduledAt('')
+      setDescription('')
+      setServerError(null)
     }
   }, [open])
 
-  const schema = z.object({
-    propertyId: z.string().min(1, t('form.error.propertyRequired')),
-    title: z.string().min(1, t('form.error.titleRequired')),
-    description: z.string().optional(),
-    type: z.enum(['CLEANING', 'MAINTENANCE', 'INSPECTION', 'CHECK_IN', 'CHECK_OUT', 'TURNOVER', 'OTHER']),
-    scheduledAt: z.string().optional(),
-    assignedUserId: z.string().optional(),
-  })
+  function buildTitle() {
+    const typeLabel = t(`type.${TASK_TYPE_KEY_MAP[taskType] ?? 'other'}`)
+    const prop = properties.find((p) => p.id === propertyId)
+    const member = members.find((m) => m.user.id === assigneeId)
+    let title = typeLabel
+    if (prop) title += ` - ${prop.name}`
+    if (member) title += ` - ${member.user.name.split(' ')[0]}`
+    return title
+  }
 
-  type FormData = z.infer<typeof schema>
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      propertyId: '',
-      title: '',
-      description: '',
-      type: 'OTHER',
-      scheduledAt: '',
-    },
-  })
-
-  async function onSubmit(data: FormData) {
+  async function handleSubmit() {
+    if (!propertyId) return
+    setSubmitting(true)
     setServerError(null)
 
     try {
+      const body: Record<string, unknown> = {
+        propertyId,
+        title: buildTitle(),
+        type: taskType,
+      }
+      if (scheduledAt) body.scheduledAt = scheduledAt
+      if (description) body.description = description
+      if (assigneeId) body.assignedUserId = assigneeId
+
       const res = await fetch(`${API_URL}/tasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(data),
+        body: JSON.stringify(body),
       })
 
       if (!res.ok) {
@@ -85,21 +87,12 @@ export function TaskFormSheet({ open, onOpenChange, onSuccess, properties }: Tas
         return
       }
 
-      reset()
       onSuccess()
     } catch {
       setServerError(t('form.error.generic'))
+    } finally {
+      setSubmitting(false)
     }
-  }
-
-  const typeKeyMap: Record<string, string> = {
-    CLEANING: 'cleaning',
-    MAINTENANCE: 'maintenance',
-    INSPECTION: 'inspection',
-    CHECK_IN: 'checkIn',
-    CHECK_OUT: 'checkOut',
-    TURNOVER: 'turnover',
-    OTHER: 'other',
   }
 
   return (
@@ -109,10 +102,10 @@ export function TaskFormSheet({ open, onOpenChange, onSuccess, properties }: Tas
           <SheetTitle>{t('form.createTitle')}</SheetTitle>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-6 px-1">
+        <div className="space-y-4 mt-6 px-1">
           <div className="space-y-1">
             <Label>{t('form.property')}</Label>
-            <Select onValueChange={(val) => setValue('propertyId', val)}>
+            <Select value={propertyId} onValueChange={setPropertyId}>
               <SelectTrigger>
                 <SelectValue placeholder={t('fields.property')} />
               </SelectTrigger>
@@ -127,34 +120,21 @@ export function TaskFormSheet({ open, onOpenChange, onSuccess, properties }: Tas
                 ))}
               </SelectContent>
             </Select>
-            {errors.propertyId && (
-              <p className="text-caption text-danger">{errors.propertyId.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-1">
-            <Label htmlFor="title">{t('form.title')}</Label>
-            <Input
-              id="title"
-              placeholder={t('form.titlePlaceholder')}
-              {...register('title')}
-              aria-invalid={!!errors.title}
-            />
-            {errors.title && (
-              <p className="text-caption text-danger">{errors.title.message}</p>
+            {!propertyId && serverError && (
+              <p className="text-caption text-danger">{t('form.error.propertyRequired')}</p>
             )}
           </div>
 
           <div className="space-y-1">
             <Label>{t('form.type')}</Label>
-            <Select defaultValue="OTHER" onValueChange={(val) => setValue('type', val as FormData['type'])}>
+            <Select value={taskType} onValueChange={setTaskType}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {TASK_TYPES.map((tt) => (
-                  <SelectItem key={tt} value={tt}>
-                    {t(`type.${typeKeyMap[tt]}`)}
+                {Object.entries(TASK_TYPE_KEY_MAP).map(([key, i18nKey]) => (
+                  <SelectItem key={key} value={key}>
+                    {t(`type.${i18nKey}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -162,18 +142,18 @@ export function TaskFormSheet({ open, onOpenChange, onSuccess, properties }: Tas
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="scheduledAt">{t('form.scheduledAt')}</Label>
-            <Input
-              id="scheduledAt"
-              type="datetime-local"
-              {...register('scheduledAt')}
+            <Label>{t('form.scheduledAt')}</Label>
+            <DateTimePicker
+              value={scheduledAt || undefined}
+              onChange={setScheduledAt}
+              placeholder={t('form.scheduledAt')}
             />
           </div>
 
           {members.length > 0 && (
             <div className="space-y-1">
               <Label>{t('assignTo')}</Label>
-              <Select onValueChange={(val) => setValue('assignedUserId', val === '_none' ? undefined : val)}>
+              <Select value={assigneeId} onValueChange={(val) => setAssigneeId(val === '_none' ? '' : val)}>
                 <SelectTrigger>
                   <SelectValue placeholder={t('selectStaff')} />
                 </SelectTrigger>
@@ -190,12 +170,12 @@ export function TaskFormSheet({ open, onOpenChange, onSuccess, properties }: Tas
           )}
 
           <div className="space-y-1">
-            <Label htmlFor="description">{t('form.description')}</Label>
+            <Label>{t('form.description')}</Label>
             <Textarea
-              id="description"
               placeholder={t('form.descriptionPlaceholder')}
               rows={3}
-              {...register('description')}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
 
@@ -205,10 +185,10 @@ export function TaskFormSheet({ open, onOpenChange, onSuccess, properties }: Tas
             </p>
           )}
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? t('form.creating') : t('form.submit')}
+          <Button className="w-full" disabled={submitting || !propertyId} onClick={handleSubmit}>
+            {submitting ? t('form.creating') : t('form.submit')}
           </Button>
-        </form>
+        </div>
       </SheetContent>
     </Sheet>
   )

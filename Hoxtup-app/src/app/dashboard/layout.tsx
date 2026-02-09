@@ -1,6 +1,11 @@
-import { DashboardShell } from '@/components/dashboard-shell'
+'use client'
 
-export const dynamic = 'force-dynamic'
+import dynamic from 'next/dynamic'
+
+const DashboardShell = dynamic(
+  () => import('@/components/dashboard-shell').then((mod) => mod.DashboardShell),
+  { ssr: false },
+)
 
 export default function DashboardLayout({
   children,

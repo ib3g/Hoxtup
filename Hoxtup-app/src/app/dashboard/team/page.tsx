@@ -82,11 +82,11 @@ export default function TeamPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-heading">{t('title')}</h2>
-        <Button disabled>
-          <UserPlus className="size-4 mr-2" />
-          {t('invite')}
+      <div className="flex justify-end gap-2 flex-wrap">
+        <Button disabled size="sm">
+          <UserPlus className="size-4 mr-1" />
+          <span className="hidden sm:inline">{t('invite')}</span>
+          <span className="sm:hidden">{t('invite')}</span>
         </Button>
       </div>
 
@@ -107,11 +107,11 @@ export default function TeamPage() {
                   {m.user.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-label">{m.user.name}</p>
-                  <p className="text-micro text-muted-foreground">{m.user.email}</p>
+                  <p className="text-label truncate">{m.user.name}</p>
+                  <p className="text-micro text-muted-foreground truncate">{m.user.email}</p>
                 </div>
                 <Select value={m.role} onValueChange={(val) => handleRoleChange(m.id, val)}>
-                  <SelectTrigger className="w-40">
+                  <SelectTrigger className="w-28 sm:w-40 shrink-0">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

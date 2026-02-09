@@ -77,7 +77,13 @@
       "confirm": "Archiver",
       "cancel": "Annuler"
     },
-    "notFound": "Propriété introuvable"
+    "notFound": "Propriété introuvable",
+    "tasksCount": "{{count}} tâche(s)",
+    "reservationsCount": "{{count}} réservation(s)",
+    "noTasks": "Aucune tâche pour cette propriété",
+    "noReservations": "Aucune réservation pour cette propriété",
+    "upcomingReservations": "Réservations à venir",
+    "recentTasks": "Tâches récentes"
   },
   "form": {
     "createTitle": "Nouvelle propriété",

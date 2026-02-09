@@ -1,58 +1,43 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
-import { LogOut, User, Building2, Globe } from 'lucide-react'
+import { LogOut, User, Globe, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { useAuth } from '@/hooks/useAuth'
+import { authClient } from '@/lib/auth-client'
 import { toast } from 'sonner'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
-
-interface SessionUser {
-  id: string
-  name: string
-  email: string
-  role: string
-}
+const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL ?? 'http://localhost:8000'
 
 export default function SettingsPage() {
   const { t } = useTranslation('settings')
   const router = useRouter()
-  const [user, setUser] = useState<SessionUser | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [name, setName] = useState('')
+  const { user, activeOrg, signOut } = useAuth()
+  const memberRole = activeOrg?.members?.[0]?.role ?? 'member'
+
+  const [editing, setEditing] = useState(false)
+  const [name, setName] = useState(user?.name ?? '')
   const [saving, setSaving] = useState(false)
   const [logoutOpen, setLogoutOpen] = useState(false)
-
-  useEffect(() => {
-    fetch(`${API_URL}/api/auth/get-session`, { credentials: 'include' })
-      .then((r) => r.ok ? r.json() : null)
-      .then((data: { user?: SessionUser } | null) => {
-        if (data?.user) {
-          setUser(data.user)
-          setName(data.user.name)
-        }
-      })
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false))
-  }, [])
 
   async function handleSaveName() {
     setSaving(true)
     try {
-      const res = await fetch(`${API_URL}/api/auth/update-user`, {
+      const res = await fetch(`${AUTH_URL}/api/auth/update-user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ name }),
       })
       if (res.ok) {
+        setEditing(false)
         toast.success(t('saved'))
       }
     } finally {
@@ -61,82 +46,106 @@ export default function SettingsPage() {
   }
 
   async function handleLogout() {
-    await fetch(`${API_URL}/api/auth/sign-out`, {
-      method: 'POST',
-      credentials: 'include',
-    })
+    await signOut()
     router.push('/login')
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-48 rounded-lg" />
-      </div>
-    )
-  }
+  const initials = user?.name
+    ?.split(' ')
+    .map((n: string) => n.charAt(0).toUpperCase())
+    .slice(0, 2)
+    .join('') ?? '?'
 
   return (
     <div className="space-y-6">
-      <h2 className="text-heading">{t('title')}</h2>
 
-      <Card>
-        <CardContent className="p-5 space-y-4">
-          <div className="flex items-center gap-2 mb-2">
-            <User className="size-4 text-muted-foreground" />
-            <h3 className="text-label">{t('profile.title')}</h3>
-          </div>
-
-          <div className="space-y-1">
-            <Label htmlFor="name">{t('profile.firstName')}</Label>
-            <div className="flex gap-2">
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-              <Button onClick={handleSaveName} disabled={saving || name === user?.name}>
-                {saving ? t('saving') : t('save')}
-              </Button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardContent className="p-6 space-y-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <User className="size-4 text-muted-foreground" />
+                <h3 className="text-label">{t('profile.title')}</h3>
+              </div>
+              {!editing && (
+                <Button variant="ghost" size="xs" onClick={() => setEditing(true)}>
+                  <Pencil className="size-3.5 mr-1" />
+                  {t('edit')}
+                </Button>
+              )}
             </div>
-          </div>
 
-          <div className="space-y-1">
-            <Label>{t('profile.email')}</Label>
-            <p className="text-body text-muted-foreground">{user?.email}</p>
-          </div>
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary text-lg font-semibold shrink-0">
+                {initials}
+              </div>
+              <div className="min-w-0">
+                <p className="text-heading truncate">{user?.name}</p>
+                <p className="text-caption text-muted-foreground">{user?.email}</p>
+              </div>
+            </div>
 
-          <div className="space-y-1">
-            <Label>{t('role')}</Label>
-            <p className="text-body text-muted-foreground">{user?.role}</p>
-          </div>
-        </CardContent>
-      </Card>
+            {editing ? (
+              <div className="space-y-3 pt-2 border-t">
+                <div className="space-y-1">
+                  <Label htmlFor="name">{t('profile.fullName')}</Label>
+                  <Input
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleSaveName} disabled={saving || name === user?.name}>
+                    {saving ? t('saving') : t('save')}
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => { setEditing(false); setName(user?.name ?? '') }}>
+                    {t('cancel')}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4 pt-2 border-t">
+                <div>
+                  <p className="text-micro text-muted-foreground">{t('profile.email')}</p>
+                  <p className="text-caption">{user?.email}</p>
+                </div>
+                <div>
+                  <p className="text-micro text-muted-foreground">{t('role')}</p>
+                  <Badge variant="secondary">{memberRole}</Badge>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardContent className="p-5 space-y-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Globe className="size-4 text-muted-foreground" />
-            <h3 className="text-label">{t('preferences.title')}</h3>
-          </div>
+        <div className="space-y-6">
+          <Card>
+            <CardContent className="p-6 space-y-4">
+              <div className="flex items-center gap-2">
+                <Globe className="size-4 text-muted-foreground" />
+                <h3 className="text-label">{t('preferences.title')}</h3>
+              </div>
 
-          <div className="space-y-1">
-            <Label>{t('preferences.language')}</Label>
-            <p className="text-body">{t('language.fr')}</p>
-          </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-micro text-muted-foreground">{t('preferences.language')}</p>
+                  <p className="text-caption">{t('language.fr')}</p>
+                </div>
+                <div>
+                  <p className="text-micro text-muted-foreground">{t('preferences.timezone')}</p>
+                  <p className="text-caption">{Intl.DateTimeFormat().resolvedOptions().timeZone}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-          <div className="space-y-1">
-            <Label>{t('preferences.timezone')}</Label>
-            <p className="text-body text-muted-foreground">{Intl.DateTimeFormat().resolvedOptions().timeZone}</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Button variant="destructive" className="w-full" onClick={() => setLogoutOpen(true)}>
-        <LogOut className="size-4 mr-2" />
-        {t('logout')}
-      </Button>
+          <Button variant="destructive" className="w-full" onClick={() => setLogoutOpen(true)}>
+            <LogOut className="size-4 mr-2" />
+            {t('logout')}
+          </Button>
+        </div>
+      </div>
 
       <Dialog open={logoutOpen} onOpenChange={setLogoutOpen}>
         <DialogContent>

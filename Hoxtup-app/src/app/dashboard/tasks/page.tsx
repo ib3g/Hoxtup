@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { Plus, ClipboardList } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -186,7 +187,7 @@ export default function TasksPage() {
                   <PropertyColorDot colorIndex={task.property.colorIndex} size="md" className="mt-1" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={cn('text-label', task.status === 'COMPLETED' && 'line-through')}>{task.title}</span>
+                      <Link href={`/dashboard/tasks/${task.id}`} className={cn('text-label hover:underline', task.status === 'COMPLETED' && 'line-through')}>{task.title}</Link>
                       <Badge variant="secondary" className="text-micro">{t(`type.${typeKey(task.type)}`)}</Badge>
                       <Badge variant="outline" className="text-micro">{t(`status.${statusKey(task.status)}`)}</Badge>
                     </div>

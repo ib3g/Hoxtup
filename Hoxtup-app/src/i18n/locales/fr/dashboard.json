@@ -14,9 +14,14 @@
   "kpi": {
     "occupancy": "Taux d'occupation",
     "revenue": "Revenus",
-    "tasks": "Tâches en cours",
-    "incidents": "Incidents ouverts"
+    "tasks": "Tâches aujourd'hui",
+    "checkIns": "Check-ins",
+    "incidents": "Incidents ouverts",
+    "unassigned": "Non assignées"
   },
+  "todayTasks": "Tâches du jour",
+  "viewAllTasks": "Voir toutes les tâches",
+  "noTasksToday": "Aucune tâche planifiée aujourd'hui",
   "quickActions": {
     "title": "Actions rapides",
     "newTask": "Nouvelle tâche",

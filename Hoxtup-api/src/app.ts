@@ -14,6 +14,7 @@ import { tasksRouter } from './modules/tasks/routes.js'
 import { teamRouter } from './modules/team/routes.js'
 import { calendarRouter } from './modules/calendar/routes.js'
 import { notificationsRouter } from './modules/notifications/routes.js'
+import { dashboardRouter } from './modules/dashboard/routes.js'
 
 export function createApp() {
   const app = express()
@@ -51,6 +52,7 @@ export function createApp() {
   app.use('/api/v1/team', teamRouter)
   app.use('/api/v1/calendar', calendarRouter)
   app.use('/api/v1/notifications', notificationsRouter)
+  app.use('/api/v1/dashboard', dashboardRouter)
 
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() })

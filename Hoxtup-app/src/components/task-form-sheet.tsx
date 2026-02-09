@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod/v4'
@@ -18,6 +18,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1
 const TASK_TYPES = ['CLEANING', 'MAINTENANCE', 'INSPECTION', 'CHECK_IN', 'CHECK_OUT', 'TURNOVER', 'OTHER'] as const
 
 interface Property { id: string; name: string; colorIndex: number }
+interface TeamMember { id: string; userId: string; role: string; user: { id: string; name: string; email: string } }
 
 interface TaskFormSheetProps {
   open: boolean
@@ -29,6 +30,16 @@ interface TaskFormSheetProps {
 export function TaskFormSheet({ open, onOpenChange, onSuccess, properties }: TaskFormSheetProps) {
   const { t } = useTranslation('tasks')
   const [serverError, setServerError] = useState<string | null>(null)
+  const [members, setMembers] = useState<TeamMember[]>([])
+
+  useEffect(() => {
+    if (open) {
+      fetch(`${API_URL}/team`, { credentials: 'include' })
+        .then((r) => r.ok ? r.json() : [])
+        .then(setMembers)
+        .catch(() => setMembers([]))
+    }
+  }, [open])
 
   const schema = z.object({
     propertyId: z.string().min(1, t('form.error.propertyRequired')),
@@ -36,6 +47,7 @@ export function TaskFormSheet({ open, onOpenChange, onSuccess, properties }: Tas
     description: z.string().optional(),
     type: z.enum(['CLEANING', 'MAINTENANCE', 'INSPECTION', 'CHECK_IN', 'CHECK_OUT', 'TURNOVER', 'OTHER']),
     scheduledAt: z.string().optional(),
+    assignedUserId: z.string().optional(),
   })
 
   type FormData = z.infer<typeof schema>
@@ -157,6 +169,25 @@ export function TaskFormSheet({ open, onOpenChange, onSuccess, properties }: Tas
               {...register('scheduledAt')}
             />
           </div>
+
+          {members.length > 0 && (
+            <div className="space-y-1">
+              <Label>{t('assignTo')}</Label>
+              <Select onValueChange={(val) => setValue('assignedUserId', val === '_none' ? undefined : val)}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('selectStaff')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_none">{t('unassigned')}</SelectItem>
+                  {members.map((m) => (
+                    <SelectItem key={m.id} value={m.user.id}>
+                      {m.user.name} ({m.role})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="space-y-1">
             <Label htmlFor="description">{t('form.description')}</Label>

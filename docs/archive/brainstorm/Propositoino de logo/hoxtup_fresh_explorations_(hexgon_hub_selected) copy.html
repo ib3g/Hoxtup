@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoxtup — Nouvelles explorations créatives</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: #f8fafc;
+            padding: 40px 20px;
+            color: #1e293b;
+        }
+        
+        .container {
+            max-width: 1700px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            color: #264653;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #64748b;
+            margin-bottom: 3rem;
+            line-height: 1.5;
+        }
+        
+        .section-title {
+            font-size: 1.9rem;
+            color: #264653;
+            margin: 3.5rem 0 1.5rem 0;
+            font-weight: 600;
+            border-bottom: 3px solid #83c6e1;
+            padding-bottom: 0.5rem;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .logo-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .logo-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 32px rgba(38, 70, 83, 0.15);
+            border-color: #83c6e1;
+        }
+        
+        .logo-card.featured {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+            border-color: #83c6e1;
+        }
+        
+        .logo-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #264653;
+            margin-bottom: 0.7rem;
+        }
+        
+        .logo-desc {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 1.8rem;
+            line-height: 1.6;
+        }
+        
+        .logo-display {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 3.5rem 2rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 220px;
+        }
+        
+        .logo-display.dark {
+            background: #1e293b;
+        }
+        
+        .logo-display.white {
+            background: white;
+            border: 2px solid #E5E7EB;
+        }
+        
+        .variations {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.6rem;
+        }
+        
+        .variation-box {
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 1.2rem 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 75px;
+        }
+        
+        .variation-box.dark {
+            background: #1e293b;
+        }
+        
+        .variation-box.white {
+            background: white;
+            border: 1px solid #E5E7EB;
+        }
+        
+        /* Logo components */
+        .logo-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+        }
+        
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+        }
+        
+        .logo-text {
+            font-size: 36px;
+            font-weight: 600;
+            letter-spacing: -1.2px;
+        }
+        
+        /* Small sizes */
+        .small .logo-icon {
+            width: 22px;
+            height: 22px;
+        }
+        
+        .small .logo-text {
+            font-size: 17px;
+        }
+        
+        /* Icon only */
+        .icon-only .logo-icon {
+            width: 36px;
+            height: 36px;
+        }
+        
+        /* Colors */
+        .color-primary { color: #264653; }
+        .fill-primary { fill: #264653; }
+        .stroke-primary { stroke: #264653; }
+        
+        .color-accent { color: #d28370; }
+        .fill-accent { fill: #d28370; }
+        .stroke-accent { stroke: #d28370; }
+        
+        .color-light { color: #83c6e1; }
+        .fill-light { fill: #83c6e1; }
+        .stroke-light { stroke: #83c6e1; }
+        
+        .color-white { color: white; }
+        .fill-white { fill: white; }
+        .stroke-white { stroke: white; }
+        
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge.star {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+        }
+        
+        .badge.fresh {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+        }
+        
+        .badge.bold {
+            background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hoxtup — Nouvelles directions créatives</h1>
+        <p class="subtitle">Explorations totalement fraîches avec la palette officielle (#264653, #d28370, #83c6e1)</p>
+        
+        <!-- SECTION 1: GEOMETRIC & ABSTRACT -->
+        <h2 class="section-title">1. Géométrique & Abstrait — Formes pures</h2>
+        
+        <div class="grid">
+            <!-- Logo 1: Hexagon Hub -->
+            <div class="logo-card featured">
+                <h3 class="logo-title">Hexagon Hub <span class="badge star">★ Signature</span></h3>
+                <p class="logo-desc">Hexagone représentant le "hub" opérationnel. Flèche ascendante intégrée. Moderne, tech, symbolise la centralisation des opérations.</p>
+                
+                <div class="logo-display">
+                    <div class="logo-container">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <!-- Hexagon -->
+                                <path d="M24 4 L38 12 L38 28 L24 36 L10 28 L10 12 Z" fill="#264653"/>
+                                <!-- Up arrow integrated -->
+                                <path d="M24 14 L24 28 M18 20 L24 14 L30 20" stroke="#83c6e1" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <!-- Accent dot -->
+                                <circle cx="24" cy="22" r="2" fill="#d28370"/>
+                            </svg>
+                        </div>
+                        <span class="logo-text color-primary">hoxtup</span>
+                    </div>
+                </div>
+                
+                <div class="variations">
+                    <div class="variation-box small">
+                        <div class="logo-container small">
+                            <div class="logo-icon">
+                                <svg viewBox="0 0 48 48" fill="none">
+                                    <path d="M24 4 L38 12 L38 28 L24 36 L10 28 L10 12 Z" fill="#264653"/>
+                                    <path d="M24 14 L24 28 M18 20 L24 14 L30 20" stroke="#83c6e1" stroke-width="3.5" stroke-linecap="round"/>
+                                    <circle cx="24" cy="22" r="2" fill="#d28370"/>
+                                </svg>
+                            </div>
+                            <span class="logo-text color-primary">hoxtup</span>
+                        </div>
+                    </div>
+                    <div class="variation-box icon-only">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M24 4 L38 12 L38 28 L24 36 L10 28 L10 12 Z" fill="#264653"/>
+                                <path d="M24 14 L24 28 M18 20 L24 14 L30 20" stroke="#83c6e1" stroke-width="3.5" stroke-linecap="round"/>
+                                <circle cx="24" cy="22" r="2" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box white">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M24 4 L38 12 L38 28 L24 36 L10 28 L10 12 Z" stroke="#264653" stroke-width="2.5" fill="none"/>
+                                <path d="M24 14 L24 28 M18 20 L24 14 L30 20" stroke="#264653" stroke-width="3" stroke-linecap="round"/>
+                                <circle cx="24" cy="22" r="2" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box dark">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M24 4 L38 12 L38 28 L24 36 L10 28 L10 12 Z" fill="white"/>
+                                <path d="M24 14 L24 28 M18 20 L24 14 L30 20" stroke="#83c6e1" stroke-width="3.5" stroke-linecap="round"/>
+                                <circle cx="24" cy="22" r="2" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Logo 2: Orbital Rings -->
+            <div class="logo-card">
+                <h3 class="logo-title">Orbital Rings <span class="badge fresh">Fresh</span></h3>
+                <p class="logo-desc">Trois cercles concentriques en orbite. Symbolise les multiples opérations qui tournent autour d'un centre. Dynamique, fluide.</p>
+                
+                <div class="logo-display">
+                    <div class="logo-container">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <!-- Outer ring -->
+                                <circle cx="24" cy="24" r="18" stroke="#83c6e1" stroke-width="2.5" fill="none" opacity="0.5"/>
+                                <!-- Middle ring -->
+                                <circle cx="24" cy="24" r="12" stroke="#264653" stroke-width="3" fill="none"/>
+                                <!-- Inner ring -->
+                                <circle cx="24" cy="24" r="6" stroke="#d28370" stroke-width="3" fill="none"/>
+                                <!-- Center dot -->
+                                <circle cx="24" cy="24" r="2.5" fill="#264653"/>
+                            </svg>
+                        </div>
+                        <span class="logo-text color-primary">hoxtup</span>
+                    </div>
+                </div>
+                
+                <div class="variations">
+                    <div class="variation-box small">
+                        <div class="logo-container small">
+                            <div class="logo-icon">
+                                <svg viewBox="0 0 48 48" fill="none">
+                                    <circle cx="24" cy="24" r="18" stroke="#83c6e1" stroke-width="2.5" fill="none" opacity="0.5"/>
+                                    <circle cx="24" cy="24" r="12" stroke="#264653" stroke-width="3" fill="none"/>
+                                    <circle cx="24" cy="24" r="6" stroke="#d28370" stroke-width="3" fill="none"/>
+                                    <circle cx="24" cy="24" r="2.5" fill="#264653"/>
+                                </svg>
+                            </div>
+                            <span class="logo-text color-primary">hoxtup</span>
+                        </div>
+                    </div>
+                    <div class="variation-box icon-only">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <circle cx="24" cy="24" r="18" stroke="#83c6e1" stroke-width="2.5" fill="none" opacity="0.5"/>
+                                <circle cx="24" cy="24" r="12" stroke="#264653" stroke-width="3" fill="none"/>
+                                <circle cx="24" cy="24" r="6" stroke="#d28370" stroke-width="3" fill="none"/>
+                                <circle cx="24" cy="24" r="2.5" fill="#264653"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box white">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <circle cx="24" cy="24" r="18" stroke="#83c6e1" stroke-width="2.5" fill="none"/>
+                                <circle cx="24" cy="24" r="12" stroke="#264653" stroke-width="2.5" fill="none"/>
+                                <circle cx="24" cy="24" r="6" stroke="#d28370" stroke-width="2.5" fill="none"/>
+                                <circle cx="24" cy="24" r="2.5" fill="#264653"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box dark">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <circle cx="24" cy="24" r="18" stroke="#83c6e1" stroke-width="2.5" fill="none"/>
+                                <circle cx="24" cy="24" r="12" stroke="white" stroke-width="3" fill="none"/>
+                                <circle cx="24" cy="24" r="6" stroke="#d28370" stroke-width="3" fill="none"/>
+                                <circle cx="24" cy="24" r="2.5" fill="white"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Logo 3: Stacked Layers -->
+            <div class="logo-card">
+                <h3 class="logo-title">Stacked Layers</h3>
+                <p class="logo-desc">Trois rectangles empilés avec progression. Évoque les niveaux d'opérations, la scalabilité, l'organisation en couches.</p>
+                
+                <div class="logo-display">
+                    <div class="logo-container">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <!-- Bottom layer (widest) -->
+                                <rect x="8" y="30" width="32" height="8" rx="2" fill="#264653" opacity="0.4"/>
+                                <!-- Middle layer -->
+                                <rect x="12" y="18" width="24" height="8" rx="2" fill="#264653" opacity="0.7"/>
+                                <!-- Top layer (narrowest, accent) -->
+                                <rect x="16" y="6" width="16" height="8" rx="2" fill="#83c6e1"/>
+                                <!-- Up arrow on top -->
+                                <path d="M24 8 L24 12 M21 9 L24 6 L27 9" stroke="#264653" stroke-width="2.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <span class="logo-text color-primary">hoxtup</span>
+                    </div>
+                </div>
+                
+                <div class="variations">
+                    <div class="variation-box small">
+                        <div class="logo-container small">
+                            <div class="logo-icon">
+                                <svg viewBox="0 0 48 48" fill="none">
+                                    <rect x="8" y="30" width="32" height="8" rx="2" fill="#264653" opacity="0.4"/>
+                                    <rect x="12" y="18" width="24" height="8" rx="2" fill="#264653" opacity="0.7"/>
+                                    <rect x="16" y="6" width="16" height="8" rx="2" fill="#83c6e1"/>
+                                    <path d="M24 8 L24 12 M21 9 L24 6 L27 9" stroke="#264653" stroke-width="2.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <span class="logo-text color-primary">hoxtup</span>
+                        </div>
+                    </div>
+                    <div class="variation-box icon-only">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <rect x="8" y="30" width="32" height="8" rx="2" fill="#264653" opacity="0.4"/>
+                                <rect x="12" y="18" width="24" height="8" rx="2" fill="#264653" opacity="0.7"/>
+                                <rect x="16" y="6" width="16" height="8" rx="2" fill="#83c6e1"/>
+                                <path d="M24 8 L24 12 M21 9 L24 6 L27 9" stroke="#264653" stroke-width="2.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box white">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <rect x="8" y="30" width="32" height="8" rx="2" fill="none" stroke="#264653" stroke-width="2" opacity="0.4"/>
+                                <rect x="12" y="18" width="24" height="8" rx="2" fill="none" stroke="#264653" stroke-width="2" opacity="0.7"/>
+                                <rect x="16" y="6" width="16" height="8" rx="2" fill="#83c6e1"/>
+                                <path d="M24 8 L24 12 M21 9 L24 6 L27 9" stroke="#264653" stroke-width="2.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box dark">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <rect x="8" y="30" width="32" height="8" rx="2" fill="white" opacity="0.4"/>
+                                <rect x="12" y="18" width="24" height="8" rx="2" fill="white" opacity="0.7"/>
+                                <rect x="16" y="6" width="16" height="8" rx="2" fill="#83c6e1"/>
+                                <path d="M24 8 L24 12 M21 9 L24 6 L27 9" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECTION 2: DYNAMIC & MOTION -->
+        <h2 class="section-title">2. Dynamique & Mouvement — Flux et trajectoires</h2>
+        
+        <div class="grid">
+            <!-- Logo 4: Wave Flow -->
+            <div class="logo-card featured">
+                <h3 class="logo-title">Wave Flow <span class="badge star">★ Fluide</span></h3>
+                <p class="logo-desc">Vague ascendante stylisée. Représente le flux continu des opérations qui montent en efficacité. Moderne, organique.</p>
+                
+                <div class="logo-display">
+                    <div class="logo-container">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <!-- Wave path -->
+                                <path d="M6 32 Q 12 28 16 32 T 26 32 Q 30 28 34 24 L34 18" 
+                                      stroke="#264653" stroke-width="4" stroke-linecap="round" fill="none"/>
+                                <path d="M6 38 Q 12 34 16 38 T 26 38 Q 30 34 34 30 L34 24" 
+                                      stroke="#83c6e1" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+                                <!-- Arrow tip -->
+                                <path d="M30 18 L34 18 L34 22" stroke="#d28370" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="34" cy="18" r="3" fill="#d28370"/>
+                            </svg>
+                        </div>
+                        <span class="logo-text color-primary">hoxtup</span>
+                    </div>
+                </div>
+                
+                <div class="variations">
+                    <div class="variation-box small">
+                        <div class="logo-container small">
+                            <div class="logo-icon">
+                                <svg viewBox="0 0 48 48" fill="none">
+                                    <path d="M6 32 Q 12 28 16 32 T 26 32 Q 30 28 34 24 L34 18" stroke="#264653" stroke-width="4" stroke-linecap="round" fill="none"/>
+                                    <path d="M6 38 Q 12 34 16 38 T 26 38 Q 30 34 34 30 L34 24" stroke="#83c6e1" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+                                    <path d="M30 18 L34 18 L34 22" stroke="#d28370" stroke-width="3.5" stroke-linecap="round"/>
+                                    <circle cx="34" cy="18" r="3" fill="#d28370"/>
+                                </svg>
+                            </div>
+                            <span class="logo-text color-primary">hoxtup</span>
+                        </div>
+                    </div>
+                    <div class="variation-box icon-only">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M6 32 Q 12 28 16 32 T 26 32 Q 30 28 34 24 L34 18" stroke="#264653" stroke-width="4" stroke-linecap="round" fill="none"/>
+                                <path d="M6 38 Q 12 34 16 38 T 26 38 Q 30 34 34 30 L34 24" stroke="#83c6e1" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+                                <circle cx="34" cy="18" r="3" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box white">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M6 32 Q 12 28 16 32 T 26 32 Q 30 28 34 24 L34 18" stroke="#264653" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                                <circle cx="34" cy="18" r="3" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box dark">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M6 32 Q 12 28 16 32 T 26 32 Q 30 28 34 24 L34 18" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
+                                <path d="M6 38 Q 12 34 16 38 T 26 38 Q 30 34 34 30 L34 24" stroke="#83c6e1" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+                                <circle cx="34" cy="18" r="3" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Logo 5: Pulse Rhythm -->
+            <div class="logo-card">
+                <h3 class="logo-title">Pulse Rhythm <span class="badge bold">Énergique</span></h3>
+                <p class="logo-desc">Battement de cœur/rythme stylisé avec montée finale. Évoque l'activité constante, le rythme opérationnel, la vitalité.</p>
+                
+                <div class="logo-display">
+                    <div class="logo-container">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <!-- Pulse line -->
+                                <path d="M4 24 L12 24 L16 16 L20 32 L24 20 L28 28 L32 12 L36 24 L44 24" 
+                                      stroke="#264653" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                                <!-- Accent on peak -->
+                                <circle cx="32" cy="12" r="3.5" fill="#d28370"/>
+                                <!-- Light background pulse -->
+                                <path d="M4 28 L12 28 L16 22 L20 34 L24 24 L28 30 L32 18 L36 28 L44 28" 
+                                      stroke="#83c6e1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.4"/>
+                            </svg>
+                        </div>
+                        <span class="logo-text color-primary">hoxtup</span>
+                    </div>
+                </div>
+                
+                <div class="variations">
+                    <div class="variation-box small">
+                        <div class="logo-container small">
+                            <div class="logo-icon">
+                                <svg viewBox="0 0 48 48" fill="none">
+                                    <path d="M4 24 L12 24 L16 16 L20 32 L24 20 L28 28 L32 12 L36 24 L44 24" stroke="#264653" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                                    <circle cx="32" cy="12" r="3.5" fill="#d28370"/>
+                                </svg>
+                            </div>
+                            <span class="logo-text color-primary">hoxtup</span>
+                        </div>
+                    </div>
+                    <div class="variation-box icon-only">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M4 24 L12 24 L16 16 L20 32 L24 20 L28 28 L32 12 L36 24 L44 24" stroke="#264653" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                                <circle cx="32" cy="12" r="3.5" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box white">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M4 24 L12 24 L16 16 L20 32 L24 20 L28 28 L32 12 L36 24 L44 24" stroke="#264653" stroke-width="3" stroke-linecap="round" fill="none"/>
+                                <circle cx="32" cy="12" r="3" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box dark">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M4 24 L12 24 L16 16 L20 32 L24 20 L28 28 L32 12 L36 24 L44 24" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                                <circle cx="32" cy="12" r="3.5" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Logo 6: Circuit Node -->
+            <div class="logo-card">
+                <h3 class="logo-title">Circuit Node</h3>
+                <p class="logo-desc">Nœud de circuit électronique avec connexions. Tech, systématique, évoque l'automatisation et les flux connectés.</p>
+                
+                <div class="logo-display">
+                    <div class="logo-container">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <!-- Central node -->
+                                <circle cx="24" cy="24" r="6" fill="#264653"/>
+                                <!-- Connection lines -->
+                                <line x1="24" y1="18" x2="24" y2="6" stroke="#264653" stroke-width="3"/>
+                                <line x1="30" y1="24" x2="42" y2="24" stroke="#264653" stroke-width="3"/>
+                                <line x1="18" y1="24" x2="6" y2="24" stroke="#83c6e1" stroke-width="3"/>
+                                <line x1="28" y1="28" x2="36" y2="36" stroke="#83c6e1" stroke-width="3"/>
+                                <!-- Connection nodes -->
+                                <circle cx="24" cy="6" r="3" fill="#d28370"/>
+                                <circle cx="42" cy="24" r="3" fill="#d28370"/>
+                                <circle cx="6" cy="24" r="3" fill="#83c6e1"/>
+                                <circle cx="36" cy="36" r="3" fill="#83c6e1"/>
+                            </svg>
+                        </div>
+                        <span class="logo-text color-primary">hoxtup</span>
+                    </div>
+                </div>
+                
+                <div class="variations">
+                    <div class="variation-box small">
+                        <div class="logo-container small">
+                            <div class="logo-icon">
+                                <svg viewBox="0 0 48 48" fill="none">
+                                    <circle cx="24" cy="24" r="6" fill="#264653"/>
+                                    <line x1="24" y1="18" x2="24" y2="6" stroke="#264653" stroke-width="3"/>
+                                    <line x1="30" y1="24" x2="42" y2="24" stroke="#264653" stroke-width="3"/>
+                                    <line x1="18" y1="24" x2="6" y2="24" stroke="#83c6e1" stroke-width="3"/>
+                                    <circle cx="24" cy="6" r="3" fill="#d28370"/>
+                                    <circle cx="42" cy="24" r="3" fill="#d28370"/>
+                                    <circle cx="6" cy="24" r="3" fill="#83c6e1"/>
+                                </svg>
+                            </div>
+                            <span class="logo-text color-primary">hoxtup</span>
+                        </div>
+                    </div>
+                    <div class="variation-box icon-only">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <circle cx="24" cy="24" r="6" fill="#264653"/>
+                                <line x1="24" y1="18" x2="24" y2="6" stroke="#264653" stroke-width="3"/>
+                                <line x1="30" y1="24" x2="42" y2="24" stroke="#264653" stroke-width="3"/>
+                                <line x1="18" y1="24" x2="6" y2="24" stroke="#83c6e1" stroke-width="3"/>
+                                <circle cx="24" cy="6" r="3" fill="#d28370"/>
+                                <circle cx="42" cy="24" r="3" fill="#d28370"/>
+                                <circle cx="6" cy="24" r="3" fill="#83c6e1"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box white">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <circle cx="24" cy="24" r="6" stroke="#264653" stroke-width="2.5" fill="none"/>
+                                <line x1="24" y1="18" x2="24" y2="6" stroke="#264653" stroke-width="2.5"/>
+                                <line x1="30" y1="24" x2="42" y2="24" stroke="#264653" stroke-width="2.5"/>
+                                <line x1="18" y1="24" x2="6" y2="24" stroke="#83c6e1" stroke-width="2.5"/>
+                                <circle cx="24" cy="6" r="3" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box dark">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <circle cx="24" cy="24" r="6" fill="white"/>
+                                <line x1="24" y1="18" x2="24" y2="6" stroke="white" stroke-width="3"/>
+                                <line x1="30" y1="24" x2="42" y2="24" stroke="white" stroke-width="3"/>
+                                <line x1="18" y1="24" x2="6" y2="24" stroke="#83c6e1" stroke-width="3"/>
+                                <circle cx="24" cy="6" r="3" fill="#d28370"/>
+                                <circle cx="42" cy="24" r="3" fill="#d28370"/>
+                                <circle cx="6" cy="24" r="3" fill="#83c6e1"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECTION 3: CONCEPTUAL & SYMBOLIC -->
+        <h2 class="section-title">3. Conceptuel & Symbolique — Métaphores visuelles</h2>
+        
+        <div class="grid">
+            <!-- Logo 7: Compass Rose -->
+            <div class="logo-card featured">
+                <h3 class="logo-title">Compass Rose <span class="badge star">★ Navigation</span></h3>
+                <p class="logo-desc">Rose des vents moderne avec flèche Nord accentuée. Symbolise la direction, l'orientation, guider les opérations.</p>
+                
+                <div class="logo-display">
+                    <div class="logo-container">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <!-- Main cardinal points -->
+                                <path d="M24 8 L24 40" stroke="#264653" stroke-width="2.5"/>
+                                <path d="M8 24 L40 24" stroke="#264653" stroke-width="2.5"/>
+                                <!-- Diagonal points -->
+                                <path d="M14 14 L34 34" stroke="#83c6e1" stroke-width="2"/>
+                                <path d="M34 14 L14 34" stroke="#83c6e1" stroke-width="2"/>
+                                <!-- North arrow (accented) -->
+                                <path d="M24 8 L20 14 L28 14 Z" fill="#d28370"/>
+                                <!-- Center circle -->
+                                <circle cx="24" cy="24" r="4" fill="none" stroke="#264653" stroke-width="2.5"/>
+                                <circle cx="24" cy="24" r="1.5" fill="#d28370"/>
+                            </svg>
+                        </div>
+                        <span class="logo-text color-primary">hoxtup</span>
+                    </div>
+                </div>
+                
+                <div class="variations">
+                    <div class="variation-box small">
+                        <div class="logo-container small">
+                            <div class="logo-icon">
+                                <svg viewBox="0 0 48 48" fill="none">
+                                    <path d="M24 8 L24 40" stroke="#264653" stroke-width="2.5"/>
+                                    <path d="M8 24 L40 24" stroke="#264653" stroke-width="2.5"/>
+                                    <path d="M14 14 L34 34" stroke="#83c6e1" stroke-width="2"/>
+                                    <path d="M34 14 L14 34" stroke="#83c6e1" stroke-width="2"/>
+                                    <path d="M24 8 L20 14 L28 14 Z" fill="#d28370"/>
+                                    <circle cx="24" cy="24" r="1.5" fill="#d28370"/>
+                                </svg>
+                            </div>
+                            <span class="logo-text color-primary">hoxtup</span>
+                        </div>
+                    </div>
+                    <div class="variation-box icon-only">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M24 8 L24 40" stroke="#264653" stroke-width="2.5"/>
+                                <path d="M8 24 L40 24" stroke="#264653" stroke-width="2.5"/>
+                                <path d="M14 14 L34 34" stroke="#83c6e1" stroke-width="2"/>
+                                <path d="M34 14 L14 34" stroke="#83c6e1" stroke-width="2"/>
+                                <path d="M24 8 L20 14 L28 14 Z" fill="#d28370"/>
+                                <circle cx="24" cy="24" r="1.5" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box white">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M24 8 L24 40" stroke="#264653" stroke-width="2"/>
+                                <path d="M8 24 L40 24" stroke="#264653" stroke-width="2"/>
+                                <path d="M24 8 L20 14 L28 14 Z" fill="#d28370"/>
+                                <circle cx="24" cy="24" r="1.5" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box dark">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M24 8 L24 40" stroke="white" stroke-width="2.5"/>
+                                <path d="M8 24 L40 24" stroke="white" stroke-width="2.5"/>
+                                <path d="M14 14 L34 34" stroke="#83c6e1" stroke-width="2"/>
+                                <path d="M34 14 L14 34" stroke="#83c6e1" stroke-width="2"/>
+                                <path d="M24 8 L20 14 L28 14 Z" fill="#d28370"/>
+                                <circle cx="24" cy="24" r="1.5" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Logo 8: Escalier / Steps -->
+            <div class="logo-card">
+                <h3 class="logo-title">Steps Up <span class="badge fresh">Progression</span></h3>
+                <p class="logo-desc">Escalier stylisé montant vers la droite. Métaphore claire de progression, amélioration continue, montée en puissance.</p>
+                
+                <div class="logo-display">
+                    <div class="logo-container">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <!-- Steps -->
+                                <path d="M6 38 L14 38 L14 30 L22 30 L22 22 L30 22 L30 14 L38 14 L38 6" 
+                                      stroke="#264653" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                                <!-- Accent on top step -->
+                                <rect x="30" y="6" width="8" height="8" rx="1" fill="#d28370"/>
+                                <!-- Light steps behind -->
+                                <path d="M6 42 L18 42 L18 34 L30 34 L30 26 L42 26" 
+                                      stroke="#83c6e1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.5"/>
+                            </svg>
+                        </div>
+                        <span class="logo-text color-primary">hoxtup</span>
+                    </div>
+                </div>
+                
+                <div class="variations">
+                    <div class="variation-box small">
+                        <div class="logo-container small">
+                            <div class="logo-icon">
+                                <svg viewBox="0 0 48 48" fill="none">
+                                    <path d="M6 38 L14 38 L14 30 L22 30 L22 22 L30 22 L30 14 L38 14 L38 6" stroke="#264653" stroke-width="4" stroke-linecap="round" fill="none"/>
+                                    <rect x="30" y="6" width="8" height="8" rx="1" fill="#d28370"/>
+                                </svg>
+                            </div>
+                            <span class="logo-text color-primary">hoxtup</span>
+                        </div>
+                    </div>
+                    <div class="variation-box icon-only">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M6 38 L14 38 L14 30 L22 30 L22 22 L30 22 L30 14 L38 14 L38 6" stroke="#264653" stroke-width="4" stroke-linecap="round" fill="none"/>
+                                <rect x="30" y="6" width="8" height="8" rx="1" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box white">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M6 38 L14 38 L14 30 L22 30 L22 22 L30 22 L30 14 L38 14 L38 6" stroke="#264653" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                                <circle cx="34" cy="10" r="3" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box dark">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M6 38 L14 38 L14 30 L22 30 L22 22 L30 22 L30 14 L38 14 L38 6" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
+                                <rect x="30" y="6" width="8" height="8" rx="1" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Logo 9: Infinity Loop -->
+            <div class="logo-card">
+                <h3 class="logo-title">Infinity Loop</h3>
+                <p class="logo-desc">Boucle infinie avec gradient de couleur. Évoque la continuité, l'automatisation perpétuelle, le cycle optimisé.</p>
+                
+                <div class="logo-display">
+                    <div class="logo-container">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <!-- Infinity symbol -->
+                                <path d="M8 24 Q 8 14 16 14 Q 24 14 24 24 Q 24 34 32 34 Q 40 34 40 24 Q 40 14 32 14 Q 24 14 24 24" 
+                                      stroke="url(#gradient1)" stroke-width="4" stroke-linecap="round" fill="none"/>
+                                <!-- Accent dots at intersections -->
+                                <circle cx="16" cy="19" r="2.5" fill="#d28370"/>
+                                <circle cx="32" cy="29" r="2.5" fill="#d28370"/>
+                                <defs>
+                                    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#264653;stop-opacity:1" />
+                                        <stop offset="50%" style="stop-color:#83c6e1;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#264653;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <span class="logo-text color-primary">hoxtup</span>
+                    </div>
+                </div>
+                
+                <div class="variations">
+                    <div class="variation-box small">
+                        <div class="logo-container small">
+                            <div class="logo-icon">
+                                <svg viewBox="0 0 48 48" fill="none">
+                                    <path d="M8 24 Q 8 14 16 14 Q 24 14 24 24 Q 24 34 32 34 Q 40 34 40 24 Q 40 14 32 14 Q 24 14 24 24" stroke="#264653" stroke-width="4" stroke-linecap="round" fill="none"/>
+                                    <circle cx="16" cy="19" r="2.5" fill="#d28370"/>
+                                    <circle cx="32" cy="29" r="2.5" fill="#d28370"/>
+                                </svg>
+                            </div>
+                            <span class="logo-text color-primary">hoxtup</span>
+                        </div>
+                    </div>
+                    <div class="variation-box icon-only">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M8 24 Q 8 14 16 14 Q 24 14 24 24 Q 24 34 32 34 Q 40 34 40 24 Q 40 14 32 14 Q 24 14 24 24" stroke="#264653" stroke-width="4" stroke-linecap="round" fill="none"/>
+                                <circle cx="16" cy="19" r="2.5" fill="#d28370"/>
+                                <circle cx="32" cy="29" r="2.5" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box white">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M8 24 Q 8 14 16 14 Q 24 14 24 24 Q 24 34 32 34 Q 40 34 40 24 Q 40 14 32 14 Q 24 14 24 24" stroke="#264653" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                                <circle cx="24" cy="24" r="2.5" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="variation-box dark">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M8 24 Q 8 14 16 14 Q 24 14 24 24 Q 24 34 32 34 Q 40 34 40 24 Q 40 14 32 14 Q 24 14 24 24" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
+                                <circle cx="16" cy="19" r="2.5" fill="#d28370"/>
+                                <circle cx="32" cy="29" r="2.5" fill="#d28370"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FINAL RECOMMENDATIONS -->
+        <div style="background: linear-gradient(135deg, #264653 0%, #1a4d5a 100%); padding: 3.5rem; border-radius: 20px; margin-top: 4rem; color: white; box-shadow: 0 20px 40px rgba(38, 70, 83, 0.3);">
+            <h2 style="font-size: 2rem; margin-bottom: 2rem; color: white; border-bottom: 3px solid #83c6e1; padding-bottom: 1rem;">🎯 Mes 3 coups de cœur</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem;">
+                <div style="background: rgba(255,255,255,0.08); padding: 1.8rem; border-radius: 16px; border-left: 4px solid #d28370;">
+                    <h3 style="color: #d28370; font-size: 1.3rem; margin-bottom: 0.8rem;">🥇 Hexagon Hub</h3>
+                    <p style="opacity: 0.95; line-height: 1.7; font-size: 0.95rem;">
+                        Forme distinctive, symbolisme fort (hub central), utilisation parfaite des 3 couleurs. Scalabilité parfaite du favicon au billboard.
+                    </p>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.08); padding: 1.8rem; border-radius: 16px; border-left: 4px solid #83c6e1;">
+                    <h3 style="color: #83c6e1; font-size: 1.3rem; margin-bottom: 0.8rem;">🥈 Wave Flow</h3>
+                    <p style="opacity: 0.95; line-height: 1.7; font-size: 0.95rem;">
+                        Dynamique et fluide, évoque parfaitement "Run operations effortlessly". Moderne sans être trop abstrait.
+                    </p>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.08); padding: 1.8rem; border-radius: 16px; border-left: 4px solid #83c6e1;">
+                    <h3 style="color: #83c6e1; font-size: 1.3rem; margin-bottom: 0.8rem;">🥉 Compass Rose</h3>
+                    <p style="opacity: 0.95; line-height: 1.7; font-size: 0.95rem;">
+                        Métaphore forte (guider/orienter), élégant et premium. Parfait pour un outil qui aide à "naviguer" les opérations.
+                    </p>
+                </div>
+            </div>
+            
+            <div style="background: rgba(255,255,255,0.12); padding: 2rem; border-radius: 16px; border-left: 5px solid #d28370;">
+                <h3 style="color: #d28370; font-size: 1.2rem; margin-bottom: 0.8rem;">💡 Pourquoi ces 3 ?</h3>
+                <p style="margin: 0; opacity: 0.95; line-height: 1.8;">
+                    Ils évitent tous les clichés du SaaS B2B (pas de checkmark, cloud, shield). Chacun a une <strong>personnalité forte</strong>, fonctionne en <strong>monochrome</strong>, et utilise intelligemment la <strong>palette tricolore</strong> (#264653 structure, #83c6e1 fraîcheur, #d28370 accent). Ils sont <strong>scalables</strong>, <strong>mémorables</strong>, et communiquent l'idée d'opérations fluides sans être littéraux.
+                </p>
+            </div>
+            
+            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(131, 198, 225, 0.15); border-radius: 12px; border: 2px solid #83c6e1;">
+                <p style="margin: 0; opacity: 0.95; line-height: 1.7; text-align: center; font-size: 1.05rem;">
+                    <strong>Mon favori absolu :</strong> <span style="color: #83c6e1; font-size: 1.2rem;">Hexagon Hub</span> — il a tout : modernité, tech, centralité, et une forme iconique qui se grave dans la mémoire.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

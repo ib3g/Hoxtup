@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoxtup — Design Direction Mockups</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* === Shared constants (never change) === */
+        :root {
+            --logo-color: #264653;
+            --brand-accent: #d28370;
+            --surface-light: #83c6e1;
+            --status-success: #2D8A6E;
+            --status-warning: #E6A347;
+            --status-error: #C45B4A;
+        }
+
+        /* === A: Teal Classique — Professional, cool, clean === */
+        :root, [data-theme="teal"] {
+            --brand-primary: #264653;
+            --color-immersive: #1a2f3a;
+            --color-cta: #264653;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #eef1f5;
+            --prop-1: #264653;
+            --prop-2: #d28370;
+            --prop-3: #2D8A6E;
+            --prop-4: #6366F1;
+            --prop-5: #E6A347;
+        }
+
+        /* === B: Terre Douce — Warm undertones, no loud surfaces === */
+        [data-theme="terra"] {
+            --brand-primary: #5c3d32;
+            --color-immersive: #2c2320;
+            --color-cta: #8b5a4a;
+            --bg-primary: #faf8f6;
+            --bg-secondary: #f0ece8;
+            --prop-1: #5c3d32;
+            --prop-2: #264653;
+            --prop-3: #2D8A6E;
+            --prop-4: #6366F1;
+            --prop-5: #E6A347;
+        }
+
+        /* === C: Fusion Méditerranée — Teal reads, terra cotta acts === */
+        [data-theme="fusion"] {
+            --brand-primary: #2c4f5c;
+            --color-immersive: #1e2d35;
+            --color-cta: #a06050;
+            --bg-primary: #f9fafb;
+            --bg-secondary: #eef0f2;
+            --prop-1: #2c4f5c;
+            --prop-2: #c47a68;
+            --prop-3: #2D8A6E;
+            --prop-4: #6366F1;
+            --prop-5: #E6A347;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        .font-outfit { font-family: 'Outfit', sans-serif; }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+            padding: 3rem 2rem 1rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .page-header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #f8fafc;
+            margin-bottom: 0.5rem;
+        }
+        .page-header .dot { color: var(--brand-accent); }
+
+        /* Theme Switcher */
+        .theme-switcher {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+        }
+        .theme-switcher label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        .theme-switcher select {
+            padding: 0.5rem 2rem 0.5rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06);
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.6rem center;
+            transition: all 0.2s;
+        }
+        .theme-switcher select:hover {
+            border-color: var(--brand-accent);
+        }
+        .theme-switcher select option {
+            background: #1e293b;
+            color: #f8fafc;
+        }
+        .theme-swatch {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .theme-swatch .sw {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all 0.3s;
+        }
+        .page-header p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1.5rem 1rem;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            background: #0f172a;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .nav-tab {
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: transparent;
+            color: #94a3b8;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-tab:hover { border-color: var(--brand-accent); color: #e2e8f0; }
+        .nav-tab.active {
+            background: var(--color-cta);
+            border-color: var(--color-cta);
+            color: #fff;
+        }
+
+        /* Direction Container */
+        .direction { display: none; padding: 2rem 1rem 4rem; max-width: 1200px; margin: 0 auto; }
+        .direction.active { display: block; }
+
+        .direction-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .direction-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #f8fafc;
+            margin-bottom: 0.3rem;
+        }
+        .direction-header .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+        .badge-calm { background: rgba(45,138,110,0.2); color: #2D8A6E; }
+        .badge-data { background: rgba(99,102,241,0.2); color: #818cf8; }
+        .badge-card { background: rgba(210,131,112,0.2); color: #d28370; }
+        .badge-feed { background: rgba(131,198,225,0.2); color: #83c6e1; }
+        .badge-split { background: rgba(230,163,71,0.2); color: #E6A347; }
+        .badge-pro { background: rgba(139,92,246,0.2); color: #8B5CF6; }
+
+        .direction-header p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* Phone Mockups */
+        .mockup-row {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 2.5rem;
+        }
+
+        .phone-frame {
+            width: 320px;
+            min-height: 620px;
+            border-radius: 32px;
+            border: 3px solid #334155;
+            background: var(--bg-primary);
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+        .phone-frame .status-bar {
+            height: 44px;
+            background: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--brand-primary);
+        }
+
+        /* Screen label */
+        .screen-label {
+            text-align: center;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* Bottom Nav common */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            background: #fff;
+            border-top: 1px solid #E5E7EB;
+        }
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            font-size: 0.6rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        .bottom-nav .nav-item.active-nav { color: var(--brand-primary); }
+        .bottom-nav .nav-item .nav-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        /* Traits list */
+        .traits {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+        .trait {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.05);
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+        .trait .dot-g { width: 6px; height: 6px; border-radius: 50%; background: var(--status-success); }
+        .trait .dot-w { width: 6px; height: 6px; border-radius: 50%; background: var(--status-warning); }
+        .trait .dot-a { width: 6px; height: 6px; border-radius: 50%; background: var(--brand-accent); }
+
+        /* Comparison table */
+        .comparison {
+            max-width: 800px;
+            margin: 3rem auto 0;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .comparison table { width: 100%; border-collapse: collapse; }
+        .comparison th {
+            text-align: left;
+            padding: 0.8rem 1rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #f8fafc;
+            background: rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .comparison td {
+            padding: 0.6rem 1rem;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .comparison tr:last-child td { border-bottom: none; }
+        .star { color: var(--brand-accent); }
+
+        /* Recommendation */
+        .recommendation {
+            max-width: 700px;
+            margin: 2.5rem auto;
+            padding: 1.5rem 2rem;
+            background: rgba(38,70,83,0.15);
+            border: 1px solid rgba(38,70,83,0.3);
+            border-left: 4px solid var(--brand-primary);
+            border-radius: 12px;
+        }
+        .recommendation h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            color: #f8fafc;
+            margin-bottom: 0.5rem;
+        }
+        .recommendation p {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        /* ===== DIRECTION 1: Calm Operations ===== */
+        .d1-header {
+            padding: 16px;
+            background: var(--bg-primary);
+        }
+        .d1-logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--logo-color);
+            margin-bottom: 12px;
+        }
+        .d1-logo .accent { color: var(--brand-accent); font-size: 0.5rem; vertical-align: super; }
+        .d1-greeting {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--brand-primary);
+            margin-bottom: 4px;
+        }
+        .d1-subtitle {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        .d1-kpis {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px;
+            margin-bottom: 16px;
+        }
+        .d1-kpi {
+            flex: 1;
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .d1-kpi-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--brand-primary);
+        }
+        .d1-kpi-label {
+            font-size: 0.6rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        .d1-section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--brand-primary);
+            padding: 0 16px;
+            margin-bottom: 8px;
+        }
+        .d1-task {
+            margin: 0 16px 8px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .d1-task-color {
+            width: 4px;
+            height: 36px;
+            border-radius: 2px;
+        }
+        .d1-task-content { flex: 1; }
+        .d1-task-title {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--brand-primary);
+        }
+        .d1-task-meta {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        .d1-check {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* ===== DIRECTION 2: Dashboard First ===== */
+        .d2-dash-header {
+            background: var(--color-immersive);
+            padding: 16px 16px 20px;
+            color: #fff;
+        }
+        .d2-logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0.8;
+            margin-bottom: 12px;
+        }
+        .d2-big-number {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .d2-big-label {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-bottom: 12px;
+        }
+        .d2-mini-kpis {
+            display: flex;
+            gap: 12px;
+        }
+        .d2-mini-kpi {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+        }
+        .d2-mini-kpi-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .d2-mini-kpi-label {
+            font-size: 0.6rem;
+            opacity: 0.7;
+        }
+        .d2-content { padding: 16px; }
+        .d2-section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--brand-primary);
+            margin-bottom: 8px;
+        }
+        .d2-task-compact {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .d2-task-compact:last-child { border-bottom: none; }
+        .d2-task-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .d2-task-name {
+            flex: 1;
+            font-size: 0.8rem;
+            color: var(--brand-primary);
+            font-weight: 500;
+        }
+        .d2-task-time {
+            font-size: 0.7rem;
+            color: #94a3b8;
+        }
+
+        /* ===== DIRECTION 3: Card Mosaic ===== */
+        .d3-top-bar {
+            padding: 0 16px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-primary);
+        }
+        .d3-logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--logo-color);
+        }
+        .d3-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--logo-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .d3-cards {
+            padding: 0 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .d3-property-card {
+            border-radius: 12px;
+            padding: 14px;
+            background: #fff;
+            border-left: 4px solid;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .d3-property-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--brand-primary);
+            margin-bottom: 6px;
+        }
+        .d3-property-stats {
+            display: flex;
+            gap: 12px;
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+        .d3-property-tasks {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f1f5f9;
+        }
+        .d3-mini-task {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 0;
+            font-size: 0.75rem;
+            color: var(--brand-primary);
+        }
+        .d3-mini-check {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 1.5px solid #cbd5e1;
+        }
+
+        /* ===== DIRECTION 4: Today Feed ===== */
+        .d4-top {
+            padding: 0 16px 16px;
+            background: var(--bg-primary);
+        }
+        .d4-date {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--brand-primary);
+        }
+        .d4-date-sub {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+        .d4-zen {
+            background: linear-gradient(135deg, rgba(45,138,110,0.08), rgba(131,198,225,0.08));
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .d4-zen-icon { font-size: 1.2rem; margin-bottom: 4px; }
+        .d4-zen-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--status-success);
+        }
+        .d4-zen-sub {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+        .d4-feed { padding: 12px 16px; }
+        .d4-time-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            margin-top: 12px;
+        }
+        .d4-feed-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .d4-feed-line {
+            width: 2px;
+            background: #E5E7EB;
+            position: relative;
+        }
+        .d4-feed-dot {
+            position: absolute;
+            top: 6px;
+            left: -3px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .d4-feed-content {
+            flex: 1;
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .d4-feed-title {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--brand-primary);
+        }
+        .d4-feed-desc {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        /* ===== DIRECTION 5: Split Panel ===== */
+        .d5-split {
+            display: flex;
+            height: calc(100% - 100px);
+        }
+        .d5-sidebar {
+            width: 80px;
+            background: var(--color-immersive);
+            padding: 12px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        .d5-side-item {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.5rem;
+            gap: 3px;
+            cursor: pointer;
+        }
+        .d5-side-item.active-side {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+        }
+        .d5-side-icon { font-size: 1rem; }
+        .d5-main {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            background: var(--bg-primary);
+        }
+        .d5-main-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--brand-primary);
+            margin-bottom: 4px;
+        }
+        .d5-main-sub {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+        .d5-task-row {
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .d5-task-row .color-bar {
+            width: 3px;
+            height: 28px;
+            border-radius: 2px;
+        }
+        .d5-task-row .task-info { flex: 1; }
+        .d5-task-row .task-name {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--brand-primary);
+        }
+        .d5-task-row .task-meta {
+            font-size: 0.6rem;
+            color: #94a3b8;
+        }
+
+        /* ===== DIRECTION 6: Condensed Pro ===== */
+        .d6-toolbar {
+            background: var(--color-immersive);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #fff;
+        }
+        .d6-toolbar-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .d6-pills {
+            display: flex;
+            gap: 4px;
+        }
+        .d6-pill {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            font-weight: 500;
+            background: rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.8);
+        }
+        .d6-pill.active-pill {
+            background: rgba(255,255,255,0.25);
+            color: #fff;
+        }
+        .d6-kpi-bar {
+            display: flex;
+            background: #fff;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .d6-kpi-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px 4px;
+            border-right: 1px solid #f1f5f9;
+        }
+        .d6-kpi-item:last-child { border-right: none; }
+        .d6-kpi-val {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--brand-primary);
+        }
+        .d6-kpi-lbl {
+            font-size: 0.55rem;
+            color: #94a3b8;
+        }
+        .d6-table {
+            padding: 0 8px;
+        }
+        .d6-table-header {
+            display: flex;
+            padding: 8px 4px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .d6-table-row {
+            display: flex;
+            align-items: center;
+            padding: 8px 4px;
+            border-bottom: 1px solid #f8fafc;
+        }
+        .d6-col-status { width: 28px; }
+        .d6-col-task { flex: 1; }
+        .d6-col-prop { width: 60px; text-align: center; }
+        .d6-col-time { width: 50px; text-align: right; }
+        .d6-status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 1.5px solid #cbd5e1;
+        }
+        .d6-task-text {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--brand-primary);
+        }
+        .d6-prop-badge {
+            font-size: 0.55rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #fff;
+            font-weight: 500;
+        }
+        .d6-time-text {
+            font-size: 0.65rem;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-header">
+        <h1>ho<span class="dot">·</span>xtup Design Directions</h1>
+        <p>6 directions visuelles pour la home screen mobile. Chaque direction applique la même palette, les mêmes tokens, mais avec une philosophie de layout différente.</p>
+        <div class="theme-switcher">
+            <label>Palette :</label>
+            <select id="theme-select" onchange="switchTheme(this.value)">
+                <option value="teal">A — Teal Classique</option>
+                <option value="terra">B — Terre Douce</option>
+                <option value="fusion">C — Fusion Méditerranée</option>
+            </select>
+            <div class="theme-swatch" id="swatch">
+                <div class="sw" id="sw1" style="background: #264653;" title="Texte"></div>
+                <div class="sw" id="sw2" style="background: #d28370;" title="Accent"></div>
+                <div class="sw" id="sw3" style="background: #264653;" title="CTA"></div>
+                <div class="sw" id="sw4" style="background: #f8fafc;" title="Fond"></div>
+            </div>
+            <div id="palette-desc" style="font-size: 0.7rem; color: #64748b; margin-top: 0.5rem; font-style: italic;">Teal structure, teal CTAs, fond froid</div>
+        </div>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showDirection(1)">1. Calm Ops</button>
+        <button class="nav-tab" onclick="showDirection(2)">2. Dashboard First</button>
+        <button class="nav-tab" onclick="showDirection(3)">3. Card Mosaic</button>
+        <button class="nav-tab" onclick="showDirection(4)">4. Today Feed</button>
+        <button class="nav-tab" onclick="showDirection(5)">5. Split Panel</button>
+        <button class="nav-tab" onclick="showDirection(6)">6. Condensed Pro</button>
+    </div>
+
+    <!-- ===== DIRECTION 1: CALM OPERATIONS ===== -->
+    <div class="direction active" id="dir-1">
+        <div class="direction-header">
+            <div class="badge badge-calm">RECOMMANDÉ</div>
+            <h2>1. Calm Operations</h2>
+            <p>Ultra-minimal, inspiré de Things 3. Beaucoup d'espace blanc, cards aérées, focus sur la sérénité. Le silence visuel EST le design.</p>
+        </div>
+        <div class="traits">
+            <div class="trait"><div class="dot-g"></div> Whitespace généreux</div>
+            <div class="trait"><div class="dot-g"></div> Cards légères</div>
+            <div class="trait"><div class="dot-g"></div> KPIs discrets</div>
+            <div class="trait"><div class="dot-a"></div> Ton Things 3</div>
+        </div>
+        <div class="mockup-row">
+            <div>
+                <div class="phone-frame">
+                    <div class="status-bar">9:41</div>
+                    <div class="d1-header">
+                        <div class="d1-logo">hoxtup<span class="accent"> ●</span></div>
+                        <div class="d1-greeting">Bonjour Sophie</div>
+                        <div class="d1-subtitle">Mardi 7 février — Tout est sous contrôle</div>
+                    </div>
+                    <div class="d1-kpis">
+                        <div class="d1-kpi">
+                            <div class="d1-kpi-value" style="color: var(--status-success);">0</div>
+                            <div class="d1-kpi-label">Urgentes</div>
+                        </div>
+                        <div class="d1-kpi">
+                            <div class="d1-kpi-value">3</div>
+                            <div class="d1-kpi-label">Aujourd'hui</div>
+                        </div>
+                        <div class="d1-kpi">
+                            <div class="d1-kpi-value">2</div>
+                            <div class="d1-kpi-label">À venir</div>
+                        </div>
+                    </div>
+                    <div class="d1-section-title">Aujourd'hui</div>
+                    <div class="d1-task">
+                        <div class="d1-task-color" style="background: var(--prop-2);"></div>
+                        <div class="d1-task-content">
+                            <div class="d1-task-title">Ménage check-out</div>
+                            <div class="d1-task-meta">Riad Jasmin · Fatima · 10:00</div>
+                        </div>
+                        <div class="d1-check"></div>
+                    </div>
+                    <div class="d1-task">
+                        <div class="d1-task-color" style="background: var(--prop-1);"></div>
+                        <div class="d1-task-content">
+                            <div class="d1-task-title">Check-in préparation</div>
+                            <div class="d1-task-meta">Apt Océan · Karim · 14:00</div>
+                        </div>
+                        <div class="d1-check"></div>
+                    </div>
+                    <div class="d1-task">
+                        <div class="d1-task-color" style="background: var(--prop-3);"></div>
+                        <div class="d1-task-content">
+                            <div class="d1-task-title">Restock serviettes</div>
+                            <div class="d1-task-meta">Villa Palms · Stock · 16:00</div>
+                        </div>
+                        <div class="d1-check"></div>
+                    </div>
+                    <div style="height: 12px;"></div>
+                    <div class="d1-section-title" style="color: #94a3b8;">À venir</div>
+                    <div class="d1-task" style="opacity: 0.6;">
+                        <div class="d1-task-color" style="background: var(--prop-4);"></div>
+                        <div class="d1-task-content">
+                            <div class="d1-task-title">Ménage Turnover</div>
+                            <div class="d1-task-meta">Studio Zen · Demain · 09:00</div>
+                        </div>
+                        <div class="d1-check"></div>
+                    </div>
+                    <div class="bottom-nav">
+                        <div class="nav-item active-nav"><div class="nav-icon">🏠</div>Home</div>
+                        <div class="nav-item"><div class="nav-icon">📅</div>Calendar</div>
+                        <div class="nav-item"><div class="nav-icon">👥</div>Team</div>
+                        <div class="nav-item"><div class="nav-icon">⚙️</div>More</div>
+                    </div>
+                </div>
+                <div class="screen-label">Home — Sophie (Owner)</div>
+            </div>
+
+            <div>
+                <div class="phone-frame">
+                    <div class="status-bar">9:41</div>
+                    <div class="d1-header">
+                        <div class="d1-logo">hoxtup<span class="accent"> ●</span></div>
+                        <div class="d1-greeting">Bonjour Fatima</div>
+                        <div class="d1-subtitle">2 tâches aujourd'hui</div>
+                    </div>
+                    <div class="d1-section-title">Ma prochaine tâche</div>
+                    <div class="d1-task" style="border: 2px solid rgba(38,70,83,0.15); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        <div class="d1-task-color" style="background: var(--prop-2);"></div>
+                        <div class="d1-task-content">
+                            <div class="d1-task-title" style="font-size: 0.9rem;">Ménage check-out</div>
+                            <div class="d1-task-meta">Riad Jasmin · 10:00</div>
+                            <div style="margin-top: 8px; padding: 6px 12px; background: var(--color-cta); color: #fff; border-radius: 6px; text-align: center; font-size: 0.75rem; font-weight: 500;">Commencer</div>
+                        </div>
+                    </div>
+                    <div style="height: 16px;"></div>
+                    <div class="d1-section-title" style="color: #94a3b8;">Ensuite</div>
+                    <div class="d1-task" style="opacity: 0.5;">
+                        <div class="d1-task-color" style="background: var(--prop-1);"></div>
+                        <div class="d1-task-content">
+                            <div class="d1-task-title">Check-in préparation</div>
+                            <div class="d1-task-meta">Apt Océan · 14:00</div>
+                        </div>
+                    </div>
+                    <div style="flex: 1;"></div>
+                    <div style="padding: 24px 16px; text-align: center;">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--status-error); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin: 0 auto 8px; box-shadow: 0 4px 12px rgba(196,91,74,0.3);">⚠️</div>
+                        <div style="font-size: 0.75rem; color: #64748b;">Signaler un problème</div>
+                    </div>
+                    <div class="bottom-nav">
+                        <div class="nav-item active-nav"><div class="nav-icon">✅</div>Tâches</div>
+                        <div class="nav-item"><div class="nav-icon">📅</div>Planning</div>
+                        <div class="nav-item"><div class="nav-icon">⚠️</div>Incident</div>
+                    </div>
+                </div>
+                <div class="screen-label">Home — Fatima (Staff / Field Mode)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DIRECTION 2: DASHBOARD FIRST ===== -->
+    <div class="direction" id="dir-2">
+        <div class="direction-header">
+            <div class="badge badge-data">DATA-FORWARD</div>
+            <h2>2. Dashboard First</h2>
+            <p>KPIs mis en avant dans un header immersif teal. Les chiffres dominent, les tâches viennent après. Pour Sophie qui veut le contrôle en un regard.</p>
+        </div>
+        <div class="traits">
+            <div class="trait"><div class="dot-g"></div> KPIs proéminents</div>
+            <div class="trait"><div class="dot-g"></div> Header immersif</div>
+            <div class="trait"><div class="dot-w"></div> Plus dense</div>
+            <div class="trait"><div class="dot-a"></div> Ton analytique</div>
+        </div>
+        <div class="mockup-row">
+            <div>
+                <div class="phone-frame">
+                    <div class="status-bar" style="background: var(--color-immersive); color: rgba(255,255,255,0.7);">9:41</div>
+                    <div class="d2-dash-header">
+                        <div class="d2-logo">hoxtup</div>
+                        <div class="d2-big-number">5</div>
+                        <div class="d2-big-label">tâches aujourd'hui</div>
+                        <div class="d2-mini-kpis">
+                            <div class="d2-mini-kpi">
+                                <div class="d2-mini-kpi-value">2</div>
+                                <div class="d2-mini-kpi-label">Check-in</div>
+                            </div>
+                            <div class="d2-mini-kpi">
+                                <div class="d2-mini-kpi-value">1</div>
+                                <div class="d2-mini-kpi-label">Check-out</div>
+                            </div>
+                            <div class="d2-mini-kpi">
+                                <div class="d2-mini-kpi-value" style="color: var(--status-warning);">1</div>
+                                <div class="d2-mini-kpi-label">Alerte stock</div>
+                            </div>
+                            <div class="d2-mini-kpi">
+                                <div class="d2-mini-kpi-value" style="color: var(--status-success);">0</div>
+                                <div class="d2-mini-kpi-label">Incidents</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d2-content">
+                        <div class="d2-section-title">Prochaines tâches</div>
+                        <div class="d2-task-compact">
+                            <div class="d2-task-dot" style="background: var(--prop-2);"></div>
+                            <div class="d2-task-name">Ménage check-out</div>
+                            <div class="d2-task-time">10:00</div>
+                        </div>
+                        <div class="d2-task-compact">
+                            <div class="d2-task-dot" style="background: var(--prop-1);"></div>
+                            <div class="d2-task-name">Check-in préparation</div>
+                            <div class="d2-task-time">14:00</div>
+                        </div>
+                        <div class="d2-task-compact">
+                            <div class="d2-task-dot" style="background: var(--prop-3);"></div>
+                            <div class="d2-task-name">Restock serviettes</div>
+                            <div class="d2-task-time">16:00</div>
+                        </div>
+                        <div class="d2-task-compact">
+                            <div class="d2-task-dot" style="background: var(--prop-4);"></div>
+                            <div class="d2-task-name">Vérification plomberie</div>
+                            <div class="d2-task-time">17:00</div>
+                        </div>
+                        <div style="margin-top: 16px;">
+                            <div class="d2-section-title" style="color: #94a3b8;">Demain</div>
+                            <div class="d2-task-compact" style="opacity: 0.5;">
+                                <div class="d2-task-dot" style="background: var(--prop-5);"></div>
+                                <div class="d2-task-name">Turnover Studio Zen</div>
+                                <div class="d2-task-time">09:00</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bottom-nav">
+                        <div class="nav-item active-nav"><div class="nav-icon">📊</div>Dashboard</div>
+                        <div class="nav-item"><div class="nav-icon">📅</div>Calendar</div>
+                        <div class="nav-item"><div class="nav-icon">👥</div>Team</div>
+                        <div class="nav-item"><div class="nav-icon">⚙️</div>More</div>
+                    </div>
+                </div>
+                <div class="screen-label">Home — Sophie (Owner)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DIRECTION 3: CARD MOSAIC ===== -->
+    <div class="direction" id="dir-3">
+        <div class="direction-header">
+            <div class="badge badge-card">PAR PROPRIÉTÉ</div>
+            <h2>3. Card Mosaic</h2>
+            <p>Chaque propriété est une carte. Sophie pense en propriétés — cette direction reflète directement son modèle mental.</p>
+        </div>
+        <div class="traits">
+            <div class="trait"><div class="dot-g"></div> Orienté propriétés</div>
+            <div class="trait"><div class="dot-g"></div> Vue d'ensemble rapide</div>
+            <div class="trait"><div class="dot-w"></div> Scroll nécessaire</div>
+            <div class="trait"><div class="dot-a"></div> Ton immobilier</div>
+        </div>
+        <div class="mockup-row">
+            <div>
+                <div class="phone-frame">
+                    <div class="status-bar">9:41</div>
+                    <div class="d3-top-bar">
+                        <div class="d3-logo">hoxtup</div>
+                        <div class="d3-avatar">SB</div>
+                    </div>
+                    <div class="d3-cards">
+                        <div class="d3-property-card" style="border-left-color: var(--prop-2);">
+                            <div class="d3-property-name">Riad Jasmin</div>
+                            <div class="d3-property-stats">
+                                <span>🔄 Check-out aujourd'hui</span>
+                                <span>·</span>
+                                <span style="color: var(--status-warning);">1 tâche</span>
+                            </div>
+                            <div class="d3-property-tasks">
+                                <div class="d3-mini-task">
+                                    <div class="d3-mini-check"></div>
+                                    Ménage check-out — Fatima — 10:00
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d3-property-card" style="border-left-color: var(--prop-1);">
+                            <div class="d3-property-name">Apt Océan</div>
+                            <div class="d3-property-stats">
+                                <span>🔑 Check-in 14:00</span>
+                                <span>·</span>
+                                <span style="color: var(--status-warning);">1 tâche</span>
+                            </div>
+                            <div class="d3-property-tasks">
+                                <div class="d3-mini-task">
+                                    <div class="d3-mini-check"></div>
+                                    Check-in préparation — Karim — 14:00
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d3-property-card" style="border-left-color: var(--prop-3);">
+                            <div class="d3-property-name">Villa Palms</div>
+                            <div class="d3-property-stats">
+                                <span style="color: var(--status-success);">✓ Pas de mouvement</span>
+                                <span>·</span>
+                                <span style="color: var(--status-warning);">Stock bas</span>
+                            </div>
+                            <div class="d3-property-tasks">
+                                <div class="d3-mini-task">
+                                    <div class="d3-mini-check"></div>
+                                    Restock serviettes — 16:00
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d3-property-card" style="border-left-color: var(--prop-4); opacity: 0.5;">
+                            <div class="d3-property-name">Studio Zen</div>
+                            <div class="d3-property-stats">
+                                <span style="color: var(--status-success);">✓ Tout est OK</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bottom-nav">
+                        <div class="nav-item active-nav"><div class="nav-icon">🏘️</div>Properties</div>
+                        <div class="nav-item"><div class="nav-icon">📅</div>Calendar</div>
+                        <div class="nav-item"><div class="nav-icon">👥</div>Team</div>
+                        <div class="nav-item"><div class="nav-icon">⚙️</div>More</div>
+                    </div>
+                </div>
+                <div class="screen-label">Home — Sophie (Owner, 4 propriétés)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DIRECTION 4: TODAY FEED ===== -->
+    <div class="direction" id="dir-4">
+        <div class="direction-header">
+            <div class="badge badge-feed">CHRONOLOGIQUE</div>
+            <h2>4. Today Feed</h2>
+            <p>Timeline chronologique inspirée d'Airbnb Today. Les événements défilent dans l'ordre temporel avec une ligne de temps visuelle.</p>
+        </div>
+        <div class="traits">
+            <div class="trait"><div class="dot-g"></div> Timeline intuitive</div>
+            <div class="trait"><div class="dot-g"></div> Contexte temporel</div>
+            <div class="trait"><div class="dot-w"></div> Moins de KPIs</div>
+            <div class="trait"><div class="dot-a"></div> Ton narratif</div>
+        </div>
+        <div class="mockup-row">
+            <div>
+                <div class="phone-frame">
+                    <div class="status-bar">9:41</div>
+                    <div class="d4-top">
+                        <div class="d4-date">Mardi 7</div>
+                        <div class="d4-date-sub">février 2026 · 3 tâches · 0 alertes</div>
+                        <div class="d4-zen">
+                            <div class="d4-zen-icon">☀️</div>
+                            <div class="d4-zen-text">Tout roule aujourd'hui</div>
+                            <div class="d4-zen-sub">2 check-in · 1 check-out · Pas d'incident</div>
+                        </div>
+                    </div>
+                    <div class="d4-feed">
+                        <div class="d4-time-label">Matin</div>
+                        <div class="d4-feed-item">
+                            <div class="d4-feed-line" style="min-height: 50px;">
+                                <div class="d4-feed-dot" style="background: var(--prop-2);"></div>
+                            </div>
+                            <div class="d4-feed-content">
+                                <div class="d4-feed-title">10:00 — Ménage check-out</div>
+                                <div class="d4-feed-desc">Riad Jasmin · Assigné à Fatima</div>
+                            </div>
+                        </div>
+                        <div class="d4-time-label">Après-midi</div>
+                        <div class="d4-feed-item">
+                            <div class="d4-feed-line" style="min-height: 50px;">
+                                <div class="d4-feed-dot" style="background: var(--prop-1);"></div>
+                            </div>
+                            <div class="d4-feed-content">
+                                <div class="d4-feed-title">14:00 — Check-in préparation</div>
+                                <div class="d4-feed-desc">Apt Océan · Assigné à Karim</div>
+                            </div>
+                        </div>
+                        <div class="d4-feed-item">
+                            <div class="d4-feed-line" style="min-height: 50px;">
+                                <div class="d4-feed-dot" style="background: var(--prop-3);"></div>
+                            </div>
+                            <div class="d4-feed-content">
+                                <div class="d4-feed-title">16:00 — Restock serviettes</div>
+                                <div class="d4-feed-desc">Villa Palms · Stock</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bottom-nav">
+                        <div class="nav-item active-nav"><div class="nav-icon">📆</div>Today</div>
+                        <div class="nav-item"><div class="nav-icon">📅</div>Calendar</div>
+                        <div class="nav-item"><div class="nav-icon">👥</div>Team</div>
+                        <div class="nav-item"><div class="nav-icon">⚙️</div>More</div>
+                    </div>
+                </div>
+                <div class="screen-label">Home — Sophie (Owner)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DIRECTION 5: SPLIT PANEL ===== -->
+    <div class="direction" id="dir-5">
+        <div class="direction-header">
+            <div class="badge badge-split">SIDEBAR</div>
+            <h2>5. Split Panel</h2>
+            <p>Navigation latérale compacte avec icônes, zone principale large. Fonctionne bien sur tablette, adaptable en bottom-nav sur mobile pur.</p>
+        </div>
+        <div class="traits">
+            <div class="trait"><div class="dot-g"></div> Nav toujours visible</div>
+            <div class="trait"><div class="dot-g"></div> Tablet-optimized</div>
+            <div class="trait"><div class="dot-w"></div> Moins mobile-native</div>
+            <div class="trait"><div class="dot-a"></div> Ton application</div>
+        </div>
+        <div class="mockup-row">
+            <div>
+                <div class="phone-frame">
+                    <div class="status-bar">9:41</div>
+                    <div class="d5-split" style="height: 520px;">
+                        <div class="d5-sidebar">
+                            <div style="font-family: 'Outfit', sans-serif; font-size: 0.7rem; font-weight: 700; color: #fff; margin-bottom: 8px;">HX</div>
+                            <div class="d5-side-item active-side">
+                                <div class="d5-side-icon">🏠</div>
+                                <span>Home</span>
+                            </div>
+                            <div class="d5-side-item">
+                                <div class="d5-side-icon">📅</div>
+                                <span>Cal</span>
+                            </div>
+                            <div class="d5-side-item">
+                                <div class="d5-side-icon">👥</div>
+                                <span>Team</span>
+                            </div>
+                            <div class="d5-side-item">
+                                <div class="d5-side-icon">📦</div>
+                                <span>Stock</span>
+                            </div>
+                        </div>
+                        <div class="d5-main">
+                            <div class="d5-main-title">Aujourd'hui</div>
+                            <div class="d5-main-sub">Mar 7 fév · 3 tâches</div>
+                            <div class="d5-task-row">
+                                <div class="color-bar" style="background: var(--prop-2);"></div>
+                                <div class="task-info">
+                                    <div class="task-name">Ménage check-out</div>
+                                    <div class="task-meta">Riad Jasmin · Fatima · 10:00</div>
+                                </div>
+                                <div class="d1-check" style="width: 24px; height: 24px;"></div>
+                            </div>
+                            <div class="d5-task-row">
+                                <div class="color-bar" style="background: var(--prop-1);"></div>
+                                <div class="task-info">
+                                    <div class="task-name">Check-in prép.</div>
+                                    <div class="task-meta">Apt Océan · Karim · 14:00</div>
+                                </div>
+                                <div class="d1-check" style="width: 24px; height: 24px;"></div>
+                            </div>
+                            <div class="d5-task-row">
+                                <div class="color-bar" style="background: var(--prop-3);"></div>
+                                <div class="task-info">
+                                    <div class="task-name">Restock serviettes</div>
+                                    <div class="task-meta">Villa Palms · Stock · 16:00</div>
+                                </div>
+                                <div class="d1-check" style="width: 24px; height: 24px;"></div>
+                            </div>
+                            <div style="margin-top: 16px;">
+                                <div class="d5-main-title" style="font-size: 0.85rem; color: #94a3b8;">Demain</div>
+                                <div class="d5-task-row" style="opacity: 0.5;">
+                                    <div class="color-bar" style="background: var(--prop-4);"></div>
+                                    <div class="task-info">
+                                        <div class="task-name">Turnover</div>
+                                        <div class="task-meta">Studio Zen · 09:00</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">Home — Split Panel (Owner view)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DIRECTION 6: CONDENSED PRO ===== -->
+    <div class="direction" id="dir-6">
+        <div class="direction-header">
+            <div class="badge badge-pro">HIGH DENSITY</div>
+            <h2>6. Condensed Pro</h2>
+            <p>Haute densité, inspiré Airtable. Maximum d'information visible, vue tableau, pill toggle pour switcher les vues. Pour Karim qui gère 20 propriétés.</p>
+        </div>
+        <div class="traits">
+            <div class="trait"><div class="dot-g"></div> Maximum d'info</div>
+            <div class="trait"><div class="dot-g"></div> Vue tableau</div>
+            <div class="trait"><div class="dot-w"></div> Moins chaleureux</div>
+            <div class="trait"><div class="dot-a"></div> Ton productivité</div>
+        </div>
+        <div class="mockup-row">
+            <div>
+                <div class="phone-frame">
+                    <div class="status-bar" style="background: var(--color-immersive); color: rgba(255,255,255,0.7);">9:41</div>
+                    <div class="d6-toolbar">
+                        <div class="d6-toolbar-title">hoxtup</div>
+                        <div class="d6-pills">
+                            <div class="d6-pill active-pill">Aujourd'hui</div>
+                            <div class="d6-pill">Semaine</div>
+                            <div class="d6-pill">Équipe</div>
+                        </div>
+                    </div>
+                    <div class="d6-kpi-bar">
+                        <div class="d6-kpi-item">
+                            <div class="d6-kpi-val">5</div>
+                            <div class="d6-kpi-lbl">Tâches</div>
+                        </div>
+                        <div class="d6-kpi-item">
+                            <div class="d6-kpi-val" style="color: var(--status-success);">2</div>
+                            <div class="d6-kpi-lbl">Check-in</div>
+                        </div>
+                        <div class="d6-kpi-item">
+                            <div class="d6-kpi-val">1</div>
+                            <div class="d6-kpi-lbl">Check-out</div>
+                        </div>
+                        <div class="d6-kpi-item">
+                            <div class="d6-kpi-val" style="color: var(--status-error);">0</div>
+                            <div class="d6-kpi-lbl">Incidents</div>
+                        </div>
+                    </div>
+                    <div class="d6-table">
+                        <div class="d6-table-header">
+                            <div class="d6-col-status"></div>
+                            <div class="d6-col-task">Tâche</div>
+                            <div class="d6-col-prop">Propriété</div>
+                            <div class="d6-col-time">Heure</div>
+                        </div>
+                        <div class="d6-table-row">
+                            <div class="d6-col-status"><div class="d6-status-dot"></div></div>
+                            <div class="d6-col-task"><div class="d6-task-text">Ménage check-out</div></div>
+                            <div class="d6-col-prop"><div class="d6-prop-badge" style="background: var(--prop-2);">Jasmin</div></div>
+                            <div class="d6-col-time"><div class="d6-time-text">10:00</div></div>
+                        </div>
+                        <div class="d6-table-row">
+                            <div class="d6-col-status"><div class="d6-status-dot"></div></div>
+                            <div class="d6-col-task"><div class="d6-task-text">Check-in prép.</div></div>
+                            <div class="d6-col-prop"><div class="d6-prop-badge" style="background: var(--prop-1);">Océan</div></div>
+                            <div class="d6-col-time"><div class="d6-time-text">14:00</div></div>
+                        </div>
+                        <div class="d6-table-row">
+                            <div class="d6-col-status"><div class="d6-status-dot"></div></div>
+                            <div class="d6-col-task"><div class="d6-task-text">Restock serviettes</div></div>
+                            <div class="d6-col-prop"><div class="d6-prop-badge" style="background: var(--prop-3);">Palms</div></div>
+                            <div class="d6-col-time"><div class="d6-time-text">16:00</div></div>
+                        </div>
+                        <div class="d6-table-row">
+                            <div class="d6-col-status"><div class="d6-status-dot"></div></div>
+                            <div class="d6-col-task"><div class="d6-task-text">Vérif. plomberie</div></div>
+                            <div class="d6-col-prop"><div class="d6-prop-badge" style="background: var(--prop-4);">Zen</div></div>
+                            <div class="d6-col-time"><div class="d6-time-text">17:00</div></div>
+                        </div>
+                        <div class="d6-table-row">
+                            <div class="d6-col-status"><div class="d6-status-dot"></div></div>
+                            <div class="d6-col-task"><div class="d6-task-text">Inventaire linge</div></div>
+                            <div class="d6-col-prop"><div class="d6-prop-badge" style="background: var(--prop-5);">Sunset</div></div>
+                            <div class="d6-col-time"><div class="d6-time-text">18:00</div></div>
+                        </div>
+                        <div class="d6-table-row" style="opacity: 0.4;">
+                            <div class="d6-col-status"><div class="d6-status-dot" style="border-color: var(--status-success); background: var(--status-success);"></div></div>
+                            <div class="d6-col-task"><div class="d6-task-text" style="text-decoration: line-through;">Accueil guest</div></div>
+                            <div class="d6-col-prop"><div class="d6-prop-badge" style="background: var(--prop-2);">Jasmin</div></div>
+                            <div class="d6-col-time"><div class="d6-time-text">09:00</div></div>
+                        </div>
+                    </div>
+                    <div class="bottom-nav">
+                        <div class="nav-item active-nav"><div class="nav-icon">📋</div>Tasks</div>
+                        <div class="nav-item"><div class="nav-icon">📅</div>Calendar</div>
+                        <div class="nav-item"><div class="nav-icon">👥</div>Team</div>
+                        <div class="nav-item"><div class="nav-icon">⚙️</div>More</div>
+                    </div>
+                </div>
+                <div class="screen-label">Home — Karim (Manager, 20 propriétés)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== COMPARISON TABLE ===== -->
+    <div style="max-width: 900px; margin: 0 auto; padding: 0 1rem;">
+        <div class="comparison">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Critère</th>
+                        <th>1. Calm</th>
+                        <th>2. Dashboard</th>
+                        <th>3. Mosaic</th>
+                        <th>4. Feed</th>
+                        <th>5. Split</th>
+                        <th>6. Condensed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sérénité</td>
+                        <td><span class="star">★★★</span></td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★★★</span></td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★</span></td>
+                    </tr>
+                    <tr>
+                        <td>Info density</td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★★★</span></td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★</span></td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★★★</span></td>
+                    </tr>
+                    <tr>
+                        <td>Mobile-first</td>
+                        <td><span class="star">★★★</span></td>
+                        <td><span class="star">★★★</span></td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★★★</span></td>
+                        <td><span class="star">★</span></td>
+                        <td><span class="star">★★</span></td>
+                    </tr>
+                    <tr>
+                        <td>Actionable</td>
+                        <td><span class="star">★★★</span></td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★★★</span></td>
+                        <td><span class="star">★★★</span></td>
+                    </tr>
+                    <tr>
+                        <td>Adaptable (3 profils)</td>
+                        <td><span class="star">★★★</span></td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★</span></td>
+                        <td><span class="star">★★</span></td>
+                    </tr>
+                    <tr>
+                        <td>Premium feel</td>
+                        <td><span class="star">★★★</span></td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★★★</span></td>
+                        <td><span class="star">★★</span></td>
+                        <td><span class="star">★</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="recommendation">
+            <h3>💡 Recommandation</h3>
+            <p>
+                <strong>Direction 1 (Calm Operations)</strong> comme base principale — elle incarne parfaitement le "premium discret" et s'adapte aux 3 profils (voir le mockup Staff). 
+                <strong>Emprunter à la Direction 6</strong> le pill toggle et la KPI bar compacte pour le Manager Mode (Karim, haute densité quand il le faut). 
+                <strong>Emprunter à la Direction 4</strong> le concept de timeline pour la vue calendrier (pas la home, mais le calendar view).
+                Cela donne : <strong>Calm par défaut, Dense sur demande, Chronologique en calendrier</strong>.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function showDirection(num) {
+            document.querySelectorAll('.direction').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('dir-' + num).classList.add('active');
+            document.querySelectorAll('.nav-tab')[num - 1].classList.add('active');
+        }
+
+        const palettes = {
+            teal:   { text: '#264653', accent: '#d28370', cta: '#264653', bg: '#f8fafc', label: 'Teal structure, teal CTAs, fond froid' },
+            terra:  { text: '#5c3d32', accent: '#d28370', cta: '#8b5a4a', bg: '#faf8f6', label: 'Brun chaud, CTAs terra, fond ti\u00e8de' },
+            fusion: { text: '#2c4f5c', accent: '#d28370', cta: '#a06050', bg: '#f9fafb', label: 'Teal lit, terra cotta agit' }
+        };
+
+        function switchTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const p = palettes[theme];
+            document.getElementById('sw1').style.background = p.text;
+            document.getElementById('sw2').style.background = p.accent;
+            document.getElementById('sw3').style.background = p.cta;
+            document.getElementById('sw4').style.background = p.bg;
+            const desc = document.getElementById('palette-desc');
+            if (desc) desc.textContent = p.label;
+        }
+    </script>
+</body>
+</html>

@@ -7,23 +7,23 @@
 
 | # | Story | Scope | Status | Fichier |
 |:---|:---|:---|:---|:---|
-| mvp-01 | Design System & Tokens | Frontend only | `todo` | [mvp/mvp-01-design-system.md](./mvp/mvp-01-design-system.md) |
-| mvp-02 | App Shell & Navigation | Frontend only | `todo` | [mvp/mvp-02-app-shell.md](./mvp/mvp-02-app-shell.md) |
-| mvp-03 | Auth Pages | Backend + Frontend | `todo` | [mvp/mvp-03-auth-pages.md](./mvp/mvp-03-auth-pages.md) |
-| mvp-04 | Onboarding Flow | Backend + Frontend | `todo` | [mvp/mvp-04-onboarding.md](./mvp/mvp-04-onboarding.md) |
-| mvp-05 | Properties List & Detail | Backend + Frontend | `todo` | [mvp/mvp-05-properties.md](./mvp/mvp-05-properties.md) |
-| mvp-06 | Reservations List | Backend + Frontend | `todo` | [mvp/mvp-06-reservations.md](./mvp/mvp-06-reservations.md) |
-| mvp-07 | iCal Management | Backend + Frontend | `todo` | [mvp/mvp-07-ical.md](./mvp/mvp-07-ical.md) |
-| mvp-08 | Task List & Filtering | Backend + Frontend | `todo` | [mvp/mvp-08-task-list.md](./mvp/mvp-08-task-list.md) |
-| mvp-09 | Task Detail & Transitions | Backend + Frontend | `todo` | [mvp/mvp-09-task-detail.md](./mvp/mvp-09-task-detail.md) |
-| mvp-10 | Task Assignment | Backend + Frontend | `todo` | [mvp/mvp-10-task-assignment.md](./mvp/mvp-10-task-assignment.md) |
-| mvp-11 | Manual Task Creation | Backend + Frontend | `todo` | [mvp/mvp-11-task-create.md](./mvp/mvp-11-task-create.md) |
-| mvp-12 | Calendar View | Backend + Frontend | `todo` | [mvp/mvp-12-calendar.md](./mvp/mvp-12-calendar.md) |
-| mvp-13 | Team Management | Backend + Frontend | `todo` | [mvp/mvp-13-team.md](./mvp/mvp-13-team.md) |
-| mvp-14 | Notifications | Backend + Frontend | `todo` | [mvp/mvp-14-notifications.md](./mvp/mvp-14-notifications.md) |
-| mvp-15 | Dashboard Home | Backend + Frontend | `todo` | [mvp/mvp-15-dashboard.md](./mvp/mvp-15-dashboard.md) |
-| mvp-16 | Settings & Profile | Backend + Frontend | `todo` | [mvp/mvp-16-settings.md](./mvp/mvp-16-settings.md) |
-| mvp-17 | Billing & Subscription | Backend + Frontend | `todo` | [mvp/mvp-17-billing.md](./mvp/mvp-17-billing.md) |
+| mvp-01 | Design System & Tokens | Frontend only | `done` | [mvp/mvp-01-design-system.md](./mvp/mvp-01-design-system.md) |
+| mvp-02 | App Shell & Navigation | Frontend only | `done` | [mvp/mvp-02-app-shell.md](./mvp/mvp-02-app-shell.md) |
+| mvp-03 | Auth Pages | Backend + Frontend | `done` | [mvp/mvp-03-auth-pages.md](./mvp/mvp-03-auth-pages.md) |
+| mvp-04 | Onboarding Flow | Backend + Frontend | `done` | [mvp/mvp-04-onboarding.md](./mvp/mvp-04-onboarding.md) |
+| mvp-05 | Properties List & Detail | Backend + Frontend | `done` | [mvp/mvp-05-properties.md](./mvp/mvp-05-properties.md) |
+| mvp-06 | Reservations List | Backend + Frontend | `done` | [mvp/mvp-06-reservations.md](./mvp/mvp-06-reservations.md) |
+| mvp-07 | iCal Management | Backend + Frontend | `done` | [mvp/mvp-07-ical.md](./mvp/mvp-07-ical.md) |
+| mvp-08 | Task List & Filtering | Backend + Frontend | `done` | [mvp/mvp-08-task-list.md](./mvp/mvp-08-task-list.md) |
+| mvp-09 | Task Detail & Transitions | Backend + Frontend | `done` | [mvp/mvp-09-task-detail.md](./mvp/mvp-09-task-detail.md) |
+| mvp-10 | Task Assignment | Backend + Frontend | `done` | [mvp/mvp-10-task-assignment.md](./mvp/mvp-10-task-assignment.md) |
+| mvp-11 | Manual Task Creation | Backend + Frontend | `done` | [mvp/mvp-11-task-create.md](./mvp/mvp-11-task-create.md) |
+| mvp-12 | Calendar View | Backend + Frontend | `done` | [mvp/mvp-12-calendar.md](./mvp/mvp-12-calendar.md) |
+| mvp-13 | Team Management | Backend + Frontend | `in-progress` | [mvp/mvp-13-team.md](./mvp/mvp-13-team.md) |
+| mvp-14 | Notifications | Backend + Frontend | `done` | [mvp/mvp-14-notifications.md](./mvp/mvp-14-notifications.md) |
+| mvp-15 | Dashboard Home | Backend + Frontend | `done` | [mvp/mvp-15-dashboard.md](./mvp/mvp-15-dashboard.md) |
+| mvp-16 | Settings & Profile | Backend + Frontend | `in-progress` | [mvp/mvp-16-settings.md](./mvp/mvp-16-settings.md) |
+| mvp-17 | Billing & Subscription | Backend + Frontend | `in-progress` | [mvp/mvp-17-billing.md](./mvp/mvp-17-billing.md) |
 
 ## Phase 2 — V1 (12 stories fullstack)
 

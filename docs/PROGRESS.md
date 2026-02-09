@@ -10,9 +10,10 @@
 | Métrique | Valeur |
 |:---|:---|
 | **Phase actuelle** | Phase 1 — MVP |
-| **Story en cours** | mvp-06 (Reservations List) |
-| **Stories terminées** | 5 / 17 |
-| **Dernière mise à jour** | 2026-02-09 |
+| **Story en cours** | mvp-13, mvp-16, mvp-17 (partielles) |
+| **Stories terminées** | 14 / 17 |
+| **Stories partielles** | 3 / 17 (mvp-13, mvp-16, mvp-17) |
+| **Dernière mise à jour** | 2026-02-10 |
 
 ---
 
@@ -25,18 +26,18 @@
 | mvp-03 | Auth Pages | Backend + Frontend | ✅ Done | Session 2 |
 | mvp-04 | Onboarding Flow | Backend + Frontend | ✅ Done | Session 3 |
 | mvp-05 | Properties List & Detail | Backend + Frontend | ✅ Done | Session 3 |
-| mvp-06 | Reservations List | Backend + Frontend | ⬜ Todo | Dépend de mvp-05 |
-| mvp-07 | iCal Management | Backend + Frontend | ⬜ Todo | Dépend de mvp-05 |
-| mvp-08 | Task List & Filtering | Backend + Frontend | ⬜ Todo | Dépend de mvp-05 |
-| mvp-09 | Task Detail & Transitions | Backend + Frontend | ⬜ Todo | Dépend de mvp-08 |
-| mvp-10 | Task Assignment | Backend + Frontend | ⬜ Todo | Dépend de mvp-08 |
-| mvp-11 | Manual Task Creation | Backend + Frontend | ⬜ Todo | Dépend de mvp-08 |
-| mvp-12 | Calendar View | Backend + Frontend | ⬜ Todo | Dépend de mvp-06, mvp-08 |
-| mvp-13 | Team Management | Backend + Frontend | ⬜ Todo | Dépend de mvp-02 |
-| mvp-14 | Notifications | Backend + Frontend | ⬜ Todo | Dépend de mvp-02 |
-| mvp-15 | Dashboard Home | Backend + Frontend | ⬜ Todo | Dépend de mvp-08, mvp-06 |
-| mvp-16 | Settings & Profile | Backend + Frontend | ⬜ Todo | Dépend de mvp-02 |
-| mvp-17 | Billing & Subscription | Backend + Frontend | ⬜ Todo | Dépend de mvp-02 |
+| mvp-06 | Reservations List | Backend + Frontend | ✅ Done | Sessions 4-7 |
+| mvp-07 | iCal Management | Backend + Frontend | ✅ Done | Backend CRUD + frontend ICalTab dans property detail |
+| mvp-08 | Task List & Filtering | Backend + Frontend | ✅ Done | Sessions 4-7 |
+| mvp-09 | Task Detail & Transitions | Backend + Frontend | ✅ Done | Sessions 4-7 |
+| mvp-10 | Task Assignment | Backend + Frontend | ✅ Done | Sessions 4-7 |
+| mvp-11 | Manual Task Creation | Backend + Frontend | ✅ Done | Sessions 4-7 |
+| mvp-12 | Calendar View | Backend + Frontend | ✅ Done | Sessions 4-7 |
+| mvp-13 | Team Management | Backend + Frontend | 🔵 Partiel | Frontend done, backend manque invitations |
+| mvp-14 | Notifications | Backend + Frontend | ✅ Done | Sessions 4-7 |
+| mvp-15 | Dashboard Home | Backend + Frontend | ✅ Done | Sessions 4-7 |
+| mvp-16 | Settings & Profile | Backend + Frontend | 🔵 Partiel | Frontend done, backend manque API settings |
+| mvp-17 | Billing & Subscription | Backend + Frontend | 🔵 Partiel | Frontend done, backend plans only — manque upgrade/Polar |
 
 **Légende :** ⬜ Todo · 🔵 En cours · ✅ Done · 🔴 Bloqué
 
@@ -146,32 +147,71 @@
 
 **Prochaine session :** Commencer mvp-05 (Properties List & Detail)
 
+### Sessions 4-7 — 2026-02-09 / 2026-02-10
+
+**Objectif :** Implémenter le gros du MVP (mvp-06 à mvp-18)
+
+**Réalisé :**
+- Backend: 10 modules complets (properties, reservations, ical, tasks, team, notifications, dashboard, billing, calendar)
+- Backend: CRUD complet reservations, tasks (avec auto-rules, history, assignment)
+- Backend: Notifications (list, unread count, mark read/all)
+- Backend: Dashboard KPIs (today tasks, check-ins, incidents, unassigned)
+- Backend: Billing plans listing + current billing info
+- Backend: Calendar events aggregation
+- Frontend: Toutes les pages dashboard implémentées (properties, reservations, tasks, calendar, team, notifications, settings, billing)
+- Frontend: Sheet components (TaskDetailSheet, TaskFormSheet, ReservationDetailSheet, ReservationFormSheet, PropertyFormSheet)
+- Frontend: PageHeader component générique
+- Frontend: i18n complet (12 namespaces FR)
+- Frontend: Date-time picker component
+- Frontend: Property color dot + Task type icon components
+
+**Commits :**
+- `feat(mvp-14)` : notifications — list, read, mark all read, unread badge
+- `feat(mvp-15)` : dashboard home — KPI bar, today tasks, greeting, quick actions
+- `feat(mvp-16)` : settings & profile — name edit, preferences, logout
+- `feat(mvp-17)` : billing & subscription — plans display, current plan, upgrade CTAs
+- `feat(mvp-18)` : latest changes — task details, reservations, UI improvements
+
+**Ce qui reste (stories partielles) :**
+- mvp-13 : Backend invitation endpoints (frontend done)
+- mvp-16 : Backend settings API endpoints (frontend done)
+- mvp-17 : Backend upgrade/downgrade + Polar webhook integration
+
 ---
 
 ## Contexte technique rapide
 
 ### Backend — Ce qui existe (`Hoxtup-api/src/`)
 ```
-src/config/          → index.ts, database.ts, cors.ts, plans.ts, bullmq.ts, redis.ts, logger.ts, auth.ts
-src/common/middleware → auth.ts (requireAuth + org fallback)
-src/modules/properties → schema.ts, service.ts, routes.ts (GET + POST)
-src/modules/ical      → schema.ts, service.ts, routes.ts (POST)
-src/app.ts            → Express app (helmet, cors, Better Auth CORS fix, routes)
-src/server.ts         → Entry point (listen on PORT)
-src/generated/        → Prisma client auto-généré
+src/config/              → index.ts, database.ts, cors.ts, plans.ts, bullmq.ts, redis.ts, logger.ts, auth.ts
+src/common/middleware/   → auth.ts (requireAuth + org fallback)
+src/modules/properties/  → schema.ts, service.ts, routes.ts (CRUD + archive/reactivate)
+src/modules/reservations/→ schema.ts, service.ts, routes.ts (CRUD + filters)
+src/modules/ical/        → schema.ts, service.ts, routes.ts (sources CRUD)
+src/modules/tasks/       → schema.ts, service.ts, routes.ts (CRUD + /my + auto-rules)
+src/modules/team/        → schema.ts, service.ts, routes.ts (list, role update, remove)
+src/modules/notifications/→ schema.ts, service.ts, routes.ts (list, unread-count, mark read)
+src/modules/dashboard/   → schema.ts, service.ts, routes.ts (home KPIs)
+src/modules/billing/     → schema.ts, service.ts, routes.ts (plans, current billing)
+src/modules/calendar/    → schema.ts, service.ts, routes.ts (events aggregation)
+src/app.ts               → Express app (helmet, cors, Better Auth CORS fix, all module routes)
+src/server.ts            → Entry point (listen on PORT)
+src/generated/           → Prisma client auto-généré
 ```
 
 ### Frontend — Ce qui existe (`Hoxtup-app/src/`)
 ```
-src/app/           → layout.tsx (next/font), page.tsx (preview), globals.css (tokens), favicon.ico
-src/app/dashboard/ → layout.tsx + 9 pages (dashboard, properties, reservations, tasks, calendar, team, settings, billing, incidents, more)
-src/app/(auth)/    → layout.tsx + login, register, onboarding/{organization,property,ical,done} pages
-src/components/    → auth-guard, bottom-nav-bar, sidebar, dashboard-header, dashboard-shell, providers
-src/components/ui/ → button, card, badge, dialog, sheet, skeleton, input, label, select, textarea, sonner
-src/i18n/          → config.ts, I18nProvider.tsx, 11 namespaces FR
-src/lib/           → api-client.ts, auth-client.ts, currency.ts, utils.ts
-src/hooks/         → useAuth.ts, useCurrency.ts, useNavItems.ts
-src/generated/     → api.d.ts (types OpenAPI)
+src/app/              → layout.tsx (next/font), page.tsx (design system preview), globals.css (tokens)
+src/app/dashboard/    → layout.tsx + 12 pages (dashboard, properties, properties/[id], reservations, tasks, calendar, team, notifications, settings, billing, incidents, more)
+src/app/(auth)/       → layout.tsx + login, register, onboarding/{organization,property,ical,done}
+src/components/       → auth-guard, bottom-nav-bar, sidebar, dashboard-header, dashboard-shell, page-header, providers, onboarding-stepper
+src/components/       → task-detail-sheet, task-form-sheet, reservation-detail-sheet, reservation-form-sheet, property-form-sheet
+src/components/       → property-color-dot, task-type-icon
+src/components/ui/    → button, card, badge, dialog, sheet, skeleton, input, label, select, textarea, sonner, popover, date-time-picker
+src/i18n/             → config.ts, I18nProvider.tsx, 12 namespaces FR
+src/lib/              → api-client.ts, auth-client.ts, currency.ts, utils.ts
+src/hooks/            → useAuth.ts, useCurrency.ts, useNavItems.ts
+src/generated/        → api.d.ts (types OpenAPI)
 ```
 
 ### Deps frontend installées

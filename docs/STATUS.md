@@ -1,17 +1,18 @@
 # Status — État actuel du projet
 
-> **Dernière mise à jour :** 2026-02-09
+> **Dernière mise à jour :** 2026-02-10
 
 ## Résumé
 
 | Couche | État | Détails |
 |:---|:---|:---|
-| **Backend API** | � Nettoyé | Code obsolète supprimé. `src/config/` + `prisma/` conservés. Prêt pour mvp-01. |
+| **Backend API** | ✅ Avancé | 10 modules implémentés (properties, reservations, ical, tasks, team, notifications, dashboard, billing, calendar). Express 5 + Better Auth + Prisma 7. |
 | **Base de données** | ✅ Conservé | Prisma 7 schema (695 lignes) + RLS policies + migrations |
-| **Auth** | ✅ Conservé | Better Auth config prête (Session, Account, Member, Invitation models) |
+| **Auth** | ✅ Done | Better Auth opérationnel (login, register, session, org plugin) |
 | **Infra** | ✅ Conservé + fixé | docker-compose (+ adminer ajouté), Dockerfiles, .env |
-| **Frontend** | 🟡 Nettoyé | Code obsolète supprimé. i18n/lib/hooks/globals.css conservés. Prêt pour mvp-01. |
-| **Design System** | ✅ Done | mvp-01 : Tailwind tokens, fonts next/font, 11 shadcn/ui components, Button 4 variants |
+| **Frontend** | ✅ Avancé | 12 pages dashboard + 6 pages auth/onboarding. 15 composants custom + 13 UI. 12 namespaces i18n. |
+| **Design System** | ✅ Done | mvp-01 : Tailwind tokens, fonts next/font, 13 shadcn/ui components, Button 4 variants |
+| **MVP Progress** | 🟡 82% | 14/17 stories done, 3 partielles (mvp-13, 16, 17) |
 | **Déploiement** | 🔴 À faire | Coolify (API) + Vercel (App) non configurés |
 
 ## Nettoyage effectué (post-audit)
@@ -98,14 +99,11 @@ Le schema (695 lignes) couvre tous les modèles nécessaires :
 - **Billing :** Subscription (5 tiers)
 - **Audit :** TeamAuditLog, ReservationTaskAudit, PropertyAssignment
 
-## Prochaines étapes
+## Prochaines étapes — Compléter les 4 stories partielles
 
-Chaque story MVP est désormais **fullstack** (backend API + frontend UI). Ordre d'exécution :
-
-1. **mvp-01** — Design System & Tokens (frontend only)
-2. **mvp-02** — App Shell & Navigation (frontend + backend auth middleware)
-3. **mvp-03** — Auth Pages (frontend + Better Auth setup)
-4. Suivre le dependency graph dans `V1-ROADMAP.md`
+1. **mvp-13** — Team Management : ajouter les endpoints backend d'invitation (POST /team/invite) + gestion des invitations
+2. **mvp-16** — Settings & Profile : ajouter les endpoints backend pour user preferences (language, timezone) et password change
+3. **mvp-17** — Billing & Subscription : intégrer Polar SDK pour upgrade/downgrade + webhook handling
 
 ## Deferred items (à implémenter en V1/V1.1)
 

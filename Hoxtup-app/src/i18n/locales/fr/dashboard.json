@@ -1,0 +1,20 @@
+{
+  "greeting": "Bonjour, {{name}}",
+  "title": "Tableau de bord",
+  "kpi": {
+    "occupancy": "Taux d'occupation",
+    "revenue": "Revenus",
+    "tasks": "Tâches en cours",
+    "incidents": "Incidents ouverts"
+  },
+  "quickActions": {
+    "title": "Actions rapides",
+    "newTask": "Nouvelle tâche",
+    "newReservation": "Nouvelle réservation",
+    "viewCalendar": "Voir le calendrier"
+  },
+  "empty": {
+    "title": "Commencez par ajouter une propriété",
+    "description": "Créez votre première propriété pour organiser votre portefeuille"
+  }
+}

@@ -1,0 +1,43 @@
+_bmad
+_bmad-output
+.agent
+.windsurf
+docs
+planning-artifacts_old_deprecated
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.next/
+out/
+
+# Generated files
+generated/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+*.swp
+*.swo
+.vscode/settings.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+pnpm-debug.log*
+
+# Docker volumes (local dev)
+pgdata/
+redisdata/
+
+# Test coverage
+coverage/

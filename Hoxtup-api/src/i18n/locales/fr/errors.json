@@ -1,0 +1,15 @@
+{
+  "validation": "Données invalides",
+  "unauthorized": "Session invalide ou expirée",
+  "forbidden": "Accès interdit",
+  "notFound": "Ressource introuvable",
+  "conflict": "Conflit de données",
+  "rateLimited": "Trop de tentatives. Réessayez dans quelques minutes.",
+  "internalError": "Erreur interne du serveur",
+  "badRequest": "Requête invalide",
+  "noActiveOrg": "Aucune organisation active. Veuillez sélectionner une organisation.",
+  "tenantRequired": "Contexte d'organisation requis",
+  "permissionDenied": "Permission insuffisante pour cette action",
+  "memberNotFound": "Membre introuvable",
+  "originNotAllowed": "Origine non autorisée"
+}

@@ -1,0 +1,10 @@
+{
+  "title": "Calendrier",
+  "views": {
+    "day": "Jour",
+    "week": "Semaine",
+    "month": "Mois"
+  },
+  "today": "Aujourd'hui",
+  "noEvents": "Aucun événement"
+}

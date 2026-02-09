@@ -1,0 +1,49 @@
+{
+  "loading": "Chargement...",
+  "save": "Enregistrer",
+  "cancel": "Annuler",
+  "delete": "Supprimer",
+  "edit": "Modifier",
+  "create": "Créer",
+  "confirm": "Confirmer",
+  "back": "Retour",
+  "next": "Suivant",
+  "search": "Rechercher",
+  "filter": "Filtrer",
+  "export": "Exporter",
+  "import": "Importer",
+  "yes": "Oui",
+  "no": "Non",
+  "or": "ou",
+  "and": "et",
+  "all": "Tous",
+  "none": "Aucun",
+  "required": "Requis",
+  "optional": "Optionnel",
+  "actions": "Actions",
+  "status": "Statut",
+  "active": "Actif",
+  "inactive": "Inactif",
+  "pending": "En attente",
+  "error": {
+    "title": "Une erreur est survenue",
+    "generic": "Une erreur inattendue est survenue",
+    "network": "Erreur de connexion au serveur",
+    "notFound": "Ressource introuvable",
+    "unauthorized": "Accès non autorisé",
+    "forbidden": "Accès interdit",
+    "validation": "Données invalides",
+    "unexpected": "Une erreur inattendue est survenue",
+    "retry": "Réessayer"
+  },
+  "nav": {
+    "sidebar": "Navigation latérale",
+    "main": "Navigation principale"
+  },
+  "pagination": {
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {{current}} sur {{total}}",
+    "showing": "{{from}}-{{to}} sur {{total}}"
+  }
+}

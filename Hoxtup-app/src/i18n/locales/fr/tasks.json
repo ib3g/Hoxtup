@@ -1,0 +1,69 @@
+{
+  "title": "Tâches",
+  "create": "Nouvelle tâche",
+  "assign": "Assigner",
+  "status": {
+    "pendingValidation": "En attente",
+    "todo": "À faire",
+    "inProgress": "En cours",
+    "completed": "Terminé",
+    "incident": "Incident",
+    "fusionSuggested": "Fusion suggérée",
+    "cancelled": "Annulé"
+  },
+  "priority": {
+    "low": "Basse",
+    "medium": "Moyenne",
+    "high": "Haute",
+    "urgent": "Urgente"
+  },
+  "type": {
+    "cleaning": "Ménage",
+    "maintenance": "Maintenance",
+    "inspection": "Inspection",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "turnover": "Remise en état",
+    "other": "Autre",
+    "incident": "Incident"
+  },
+  "fields": {
+    "title": "Titre",
+    "description": "Description",
+    "assignee": "Responsable",
+    "dueDate": "Date d'échéance",
+    "property": "Propriété",
+    "notes": "Notes"
+  },
+  "actions": {
+    "validate": "Valider",
+    "start": "Commencer",
+    "complete": "Terminer",
+    "reportIncident": "Signaler incident",
+    "resolveResume": "Reprendre",
+    "resolveComplete": "Résoudre et terminer",
+    "acceptFusion": "Accepter fusion",
+    "rejectFusion": "Rejeter fusion",
+    "cancel": "Annuler"
+  },
+  "undo": "Annuler",
+  "undoComplete": "Tâche terminée. {{seconds}}s pour annuler",
+  "empty": {
+    "title": "Aucune tâche",
+    "description": "Les tâches apparaîtront ici lorsqu'elles seront créées automatiquement ou manuellement."
+  },
+  "createManual": "Créer une tâche",
+  "creating": "Création...",
+  "pendingBanner": "{{count}} tâche(s) à valider",
+  "viewPending": "Voir",
+  "assignTo": "Assigner à",
+  "selectStaff": "Sélectionner un membre",
+  "assigned": "Assignée",
+  "unassigned": "Non assignée",
+  "scheduledAt": "Planifiée le",
+  "myTasks": "Mes tâches",
+  "allTasks": "Toutes les tâches",
+  "filterByProperty": "Filtrer par propriété",
+  "filterByStatus": "Filtrer par statut",
+  "noProperty": "Toutes"
+}

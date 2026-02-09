@@ -1,0 +1,11 @@
+{
+  "title": "Notifications",
+  "markAllRead": "Tout marquer comme lu",
+  "empty": "Aucune notification",
+  "preferences": "Préférences de notification",
+  "channels": {
+    "email": "Email",
+    "push": "Notification push",
+    "inApp": "Dans l'application"
+  }
+}

@@ -1,0 +1,1855 @@
+openapi: "3.1.0"
+info:
+  title: Hoxtup API
+  version: "1.0.0"
+  description: Hoxtup operational management API
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development
+  - url: https://api.hoxtup.com/api/v1
+    description: Production
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      summary: Health check
+      tags: [System]
+      responses:
+        "200":
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+  /organizations:
+    post:
+      operationId: createOrganization
+      summary: Create organization for authenticated user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [organizationName, firstName, lastName]
+              properties:
+                organizationName:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+                firstName:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+                lastName:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+      responses:
+        "201":
+          description: Organization created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+
+  /properties:
+    get:
+      operationId: listProperties
+      summary: List all properties for organization
+      tags: [Properties]
+      parameters:
+        - name: includeArchived
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: List of properties
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [properties, total]
+                properties:
+                  properties:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Property'
+                  total:
+                    type: integer
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createProperty
+      summary: Create a new property
+      tags: [Properties]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePropertyInput'
+      responses:
+        "201":
+          description: Property created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Property'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+
+  /properties/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          
+    get:
+      operationId: getProperty
+      summary: Get property details
+      tags: [Properties]
+      responses:
+        "200":
+          description: Property details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PropertyDetails'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: updateProperty
+      summary: Update property details
+      tags: [Properties]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePropertyInput'
+      responses:
+        "200":
+          description: Property updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Property'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: archiveProperty
+      summary: Archive a property (soft delete)
+      tags: [Properties]
+      responses:
+        "200":
+          description: Property archived
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, archived]
+                properties:
+                  id:
+                    type: string
+                  archived:
+                    type: boolean
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /properties/{propertyId}/ical-sources:
+    parameters:
+      - name: propertyId
+        in: path
+        required: true
+        schema:
+          type: string
+          
+    get:
+      operationId: listICalSources
+      summary: List iCal sources for a property
+      tags: [ICal]
+      responses:
+        "200":
+          description: List of iCal sources
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [sources]
+                properties:
+                  sources:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ICalSource'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+    post:
+      operationId: createICalSource
+      summary: Add an iCal source to a property
+      tags: [ICal]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateICalSourceInput'
+      responses:
+        "201":
+          description: ICal source created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ICalSource'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /properties/{propertyId}/ical-sources/{sourceId}:
+    parameters:
+      - name: propertyId
+        in: path
+        required: true
+        schema:
+          type: string
+          
+      - name: sourceId
+        in: path
+        required: true
+        schema:
+          type: string
+    delete:
+      operationId: deleteICalSource
+      summary: Delete an iCal source
+      tags: [ICal]
+      responses:
+        "200":
+          description: ICal source deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, deleted]
+                properties:
+                  id:
+                    type: string
+                  deleted:
+                    type: boolean
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /reservations:
+    get:
+      operationId: listReservations
+      summary: List all reservations
+      tags: [Reservations]
+      parameters:
+        - name: propertyId
+          in: query
+          schema:
+            type: string
+            
+        - name: sourceType
+          in: query
+          schema:
+            type: string
+            enum: [ICAL, MANUAL]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [CONFIRMED, CANCELLED]
+      responses:
+        "200":
+          description: List of reservations
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [reservations, total]
+                properties:
+                  reservations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Reservation'
+                  total:
+                    type: integer
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createReservation
+      summary: Create a manual reservation
+      tags: [Reservations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReservationInput'
+      responses:
+        "201":
+          description: Reservation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /reservations/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          
+    get:
+      operationId: getReservation
+      summary: Get reservation details
+      tags: [Reservations]
+      responses:
+        "200":
+          description: Reservation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: updateReservation
+      summary: Update a manual reservation
+      tags: [Reservations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReservationInput'
+      responses:
+        "200":
+          description: Reservation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: cancelReservation
+      summary: Cancel a manual reservation
+      tags: [Reservations]
+      responses:
+        "200":
+          description: Reservation cancelled
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, cancelled]
+                properties:
+                  id:
+                    type: string
+                  cancelled:
+                    type: boolean
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /tasks:
+    get:
+      operationId: listTasks
+      summary: List all tasks for organization
+      tags: [Tasks]
+      parameters:
+        - name: propertyId
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/TaskStatus' }
+      responses:
+        "200":
+          description: List of tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [tasks, total]
+                properties:
+                  tasks:
+                    type: array
+                    items: { $ref: '#/components/schemas/Task' }
+                  total: { type: integer }
+    post:
+      operationId: createTask
+      summary: Create a new manual task
+      tags: [Tasks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTaskInput' }
+      responses:
+        "201":
+          description: Task created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Task' }
+
+  /tasks/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getTask
+      summary: Get task details
+      tags: [Tasks]
+      responses:
+        "200":
+          description: Task details
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Task' }
+
+  /tasks/{id}/assign:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: assignTask
+      summary: Assign task to a user
+      tags: [Tasks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [assignedUserId]
+              properties:
+                assignedUserId: { type: string }
+      responses:
+        "200":
+          description: Task assigned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Task' }
+
+  /tasks/{id}/transition:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: transitionTask
+      summary: Transition task status
+      tags: [Tasks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action: { type: string }
+      responses:
+        "200":
+          description: Status updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Task' }
+
+  /team:
+    get:
+      operationId: listTeam
+      summary: List all team members
+      tags: [Team]
+      responses:
+        "200":
+          description: List of team members
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [members, total]
+                properties:
+                  members:
+                    type: array
+                    items: { $ref: '#/components/schemas/TeamMember' }
+                  total:
+                    type: integer
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+
+  /team/staff-managed:
+    post:
+      operationId: createStaffManaged
+      summary: Create a staff member managed by the organization
+      tags: [Team]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, firstName, lastName]
+              properties:
+                name: { type: string }
+                firstName: { type: string }
+                lastName: { type: string }
+      responses:
+        "201":
+          description: Staff member created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+
+  /team/{id}/role:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateMemberRole
+      summary: Update a team member's role
+      tags: [Team]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role: { type: string }
+      responses:
+        "200":
+          description: Role updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TeamMember' }
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /team/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      operationId: removeTeamMember
+      summary: Remove or deactivate a team member
+      tags: [Team]
+      responses:
+        "200":
+          description: Member removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string }
+                  userId: { type: string }
+                  deactivated: { type: boolean }
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /notifications:
+    get:
+      operationId: listNotifications
+      summary: List user notifications
+      tags: [Notifications]
+      parameters:
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [notifications, hasMore, nextCursor]
+                properties:
+                  notifications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+                  hasMore:
+                    type: boolean
+                  nextCursor:
+                    type: string
+                    nullable: true
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/home:
+    get:
+      operationId: getHomeDashboard
+      summary: Get executive dashboard data
+      tags: [Dashboard]
+      responses:
+        "200":
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HomeDashboard'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/field:
+    get:
+      operationId: getFieldDashboard
+      summary: Get field staff dashboard data
+      tags: [Dashboard]
+      responses:
+        "200":
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldDashboard'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/activity:
+    get:
+      operationId: getActivitySummary
+      summary: Get daily activity summary
+      tags: [Dashboard]
+      parameters:
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Activity summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivitySummary'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+
+  /calendar:
+    get:
+      operationId: getCalendarEvents
+      summary: Get calendar events (reservations and tasks)
+      tags: [Calendar]
+      parameters:
+        - name: start
+          in: query
+          required: true
+          schema: { type: string }
+        - name: end
+          in: query
+          required: true
+          schema: { type: string }
+        - name: propertyId
+          in: query
+          schema: { type: string }
+        - name: userId
+          in: query
+          schema: { type: string }
+        - name: types
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: List of calendar events
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [events]
+                properties:
+                  events:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        type: { type: string, enum: [reservation, task] }
+                        title: { type: string }
+                        start: { type: string, format: date-time }
+                        end:
+                          type: string
+                          format: date-time
+                          nullable: true
+                        status: { type: string }
+                        propertyId: { type: string }
+                        propertyName: { type: string }
+                        propertyColorIndex: { type: integer }
+                        guestName: { type: string }
+                        taskType: { type: string }
+                        hasConflict: { type: boolean }
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+
+  /properties/{propertyId}/inventory:
+    parameters:
+      - name: propertyId
+        in: path
+        required: true
+        schema:
+          type: string
+          
+    get:
+      operationId: listInventoryItems
+      summary: List inventory items for a property
+      tags: [Inventory]
+      responses:
+        "200":
+          description: List of items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object # TODO: Define Item schema
+                  total: { type: integer }
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+
+  /inventory/items:
+    post:
+      operationId: createInventoryItem
+      summary: Create a new inventory item
+      tags: [Inventory]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [propertyId, name, currentQuantity, threshold]
+              properties:
+                propertyId: { type: string }
+                name: { type: string }
+                category: { type: string }
+                currentQuantity: { type: number }
+                threshold: { type: number }
+                unit: { type: string }
+      responses:
+        "201":
+          description: Item created
+          content:
+            application/json:
+              schema:
+                type: object # TODO: Define Item schema
+        "400":
+          $ref: '#/components/responses/BadRequest'
+
+  /inventory/items/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateInventoryItem
+      summary: Update an inventory item
+      tags: [Inventory]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                category: { type: string }
+                currentQuantity: { type: number }
+                threshold: { type: number }
+                unit: { type: string }
+      responses:
+        "200":
+          description: Item updated
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /inventory/items/{id}/movements:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: recordStockMovement
+      summary: Record a stock entry or exit
+      tags: [Inventory]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type, quantity]
+              properties:
+                type: { type: string, enum: [ENTRY, EXIT] }
+                quantity: { type: number }
+                costCentimes: { type: number }
+                taskId: { type: string }
+                notes: { type: string }
+      responses:
+        "201":
+          description: Movement recorded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  movement: { type: object }
+                  updatedItem: { type: object }
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "422":
+          $ref: '#/components/responses/UnprocessableEntity'
+    get:
+      operationId: getInventoryMovements
+      summary: Get stock movement history for an item
+      tags: [Inventory]
+      responses:
+        "200":
+          description: List of movements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  movements:
+                    type: array
+                    items: { type: object }
+                  total: { type: integer }
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /financials/summary:
+    get:
+      operationId: getOrgFinancialSummary
+      summary: Get organization financial summary
+      tags: [Finance]
+      parameters:
+        - name: start
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - name: end
+          in: query
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        "200":
+          description: Financial summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  properties:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        propertyId: { type: string }
+                        propertyName: { type: string }
+                        isArchived: { type: boolean }
+                        revenue: { type: integer }
+                        consumableCosts: { type: integer }
+                        assetCosts: { type: integer }
+                        profitLoss: { type: integer }
+                  totals:
+                    type: object
+                    properties:
+                      revenue: { type: integer }
+                      consumableCosts: { type: integer }
+                      assetCosts: { type: integer }
+                      profitLoss: { type: integer }
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+
+  /billing:
+    get:
+      operationId: getSubscription
+      summary: Get current subscription and usage
+      tags: [Billing]
+      responses:
+        "200":
+          description: Subscription details
+          content:
+            application/json:
+              schema:
+                type: object
+                nullable: true
+                properties:
+                  id: { type: string }
+                  status: { type: string }
+                  planTier: { type: string }
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /billing/plans:
+    get:
+      operationId: listPlans
+      summary: List available subscription plans
+      tags: [Billing]
+      responses:
+        "200":
+          description: List of plans
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plans:
+                    type: array
+                    items: { type: object }
+
+  /billing/cancel:
+    post:
+      operationId: cancelSubscription
+      summary: Cancel subscription
+      tags: [Billing]
+      responses:
+        "200":
+          description: Subscription cancelled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string }
+                  status: { type: string }
+                  cancelledAt: { type: string, format: date-time }
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /properties/{propertyId}/inventory/summary:
+    parameters:
+      - name: propertyId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getInventorySummary
+      summary: Get inventory summary for a property
+      tags: [Inventory]
+      responses:
+        "200":
+          description: Inventory summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  consumables:
+                    type: object
+                    properties:
+                      totalItems: { type: integer }
+                      belowThreshold: { type: integer }
+                      zeroStock: { type: integer }
+                  assets:
+                    type: object
+                    properties:
+                      totalAssets: { type: integer }
+                      totalInvestment: { type: integer }
+
+  /properties/{propertyId}/assets:
+    parameters:
+      - name: propertyId
+        in: path
+        required: true
+        schema: { type: string }
+      - name: includeDeleted
+        in: query
+        schema: { type: boolean }
+    get:
+      operationId: listAssetsByProperty
+      summary: List assets for a property
+      tags: [Inventory]
+      responses:
+        "200":
+          description: List of assets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assets:
+                    type: array
+                    items: { $ref: '#/components/schemas/Asset' }
+                  total: { type: integer }
+ 
+  /assets:
+    post:
+      operationId: createAsset
+      summary: Create a new asset
+      tags: [Inventory]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [propertyId, name, purchaseDate, costCentimes]
+              properties:
+                propertyId: { type: string }
+                name: { type: string }
+                category: { type: string }
+                purchaseDate: { type: string, format: date }
+                costCentimes: { type: integer }
+                supplier: { type: string }
+                notes: { type: string }
+      responses:
+        "201":
+          description: Asset created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Asset' }
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+
+  /assets/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateAsset
+      summary: Update an asset
+      tags: [Inventory]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                category: { type: string }
+                costCentimes: { type: integer }
+                supplier: { type: string }
+                notes: { type: string }
+      responses:
+        "200":
+          description: Asset updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Asset' }
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteAsset
+      summary: Soft-delete an asset
+      tags: [Inventory]
+      responses:
+        "200":
+          description: Asset deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, deleted]
+                properties:
+                  id: { type: string }
+                  deleted: { type: boolean }
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /properties/{propertyId}/revenue:
+    parameters:
+      - name: propertyId
+        in: path
+        required: true
+        schema: { type: string }
+      - name: start
+        in: query
+        schema: { type: string, format: date }
+      - name: end
+        in: query
+        schema: { type: string, format: date }
+    get:
+      operationId: listRevenueByProperty
+      summary: List revenue for a property
+      tags: [Finance]
+      responses:
+        "200":
+          description: List of revenue entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  revenues:
+                    type: array
+                    items: { $ref: '#/components/schemas/Revenue' }
+                  total: { type: integer }
+    post:
+      operationId: addRevenue
+      summary: Add revenue entry
+      tags: [Finance]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amountCentimes, date]
+              properties:
+                amountCentimes: { type: integer }
+                date: { type: string }
+                source: { type: string, enum: [AIRBNB, BOOKING, DIRECT, OTHER] }
+                notes: { type: string }
+      responses:
+        "201":
+          description: Revenue added
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Revenue' }
+
+  /properties/{propertyId}/financials:
+    parameters:
+      - name: propertyId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getPropertyFinancials
+      summary: Get financial summary for a property
+      tags: [Finance]
+      parameters:
+        - name: start
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - name: end
+          in: query
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        "200":
+          description: Financial summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  period:
+                    type: object
+                    properties:
+                      start: { type: string, format: date-time }
+                      end: { type: string, format: date-time }
+                  revenue:
+                    type: object
+                    properties:
+                      total: { type: integer }
+                      count: { type: integer }
+                  expenses:
+                    type: object
+                    properties:
+                      consumables:
+                        type: object
+                        properties:
+                          total: { type: integer }
+                          count: { type: integer }
+                      assets:
+                        type: object
+                        properties:
+                          total: { type: integer }
+                          count: { type: integer }
+                      total: { type: integer }
+                  profitLoss: { type: integer }
+        "400":
+          $ref: '#/components/responses/BadRequest'
+
+  /notifications/unread-count:
+    get:
+      operationId: getUnreadCount
+      summary: Get unread notifications count
+      tags: [Notifications]
+      responses:
+        "200":
+          description: Unread count
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count]
+                properties:
+                  count:
+                    type: integer
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/read-all:
+    patch:
+      operationId: markAllAsRead
+      summary: Mark all notifications as read
+      tags: [Notifications]
+      responses:
+        "200":
+          description: All marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [updated]
+                properties:
+                  updated:
+                    type: integer
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/{id}/read:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          
+    patch:
+      operationId: markAsRead
+      summary: Mark a single notification as read
+      tags: [Notifications]
+      responses:
+        "200":
+          description: Notification marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success]
+                properties:
+                  success:
+                    type: boolean
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /notifications/preferences:
+    get:
+      operationId: getNotificationPreferences
+      summary: Get user notification preferences
+      tags: [Notifications]
+      responses:
+        "200":
+          description: List of preferences
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [preferences]
+                properties:
+                  preferences:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/NotificationPreference'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+    patch:
+      operationId: updateNotificationPreferences
+      summary: Update user notification preferences
+      tags: [Notifications]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [updates]
+              properties:
+                updates:
+                  type: array
+                  items:
+                    type: object
+                    required: [notificationType, channel, enabled]
+                    properties:
+                      notificationType:
+                        type: string
+                      channel:
+                        type: string
+                        enum: [IN_APP, EMAIL]
+                      enabled:
+                        type: boolean
+      responses:
+        "200":
+          description: Preferences updated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [updated]
+                properties:
+                  updated:
+                    type: integer
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  schemas:
+    Organization:
+      type: object
+      required: [id, name, slug]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+
+    Property:
+      type: object
+      required: [id, name, address, capacity, type, colorIndex]
+      properties:
+        id:
+          type: string
+          
+        name:
+          type: string
+        address:
+          type: string
+        capacity:
+          type: integer
+        type:
+          type: string
+          enum: [APARTMENT, HOUSE, VILLA, STUDIO, ROOM, OTHER]
+        colorIndex:
+          type: integer
+        photoUrl:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+
+    PropertyDetails:
+      allOf:
+        - $ref: '#/components/schemas/Property'
+        - type: object
+          properties:
+            assignments:
+              type: array
+              items:
+                type: object
+                properties:
+                  userId:
+                    type: string
+                    
+
+    CreatePropertyInput:
+      type: object
+      required: [name, address, capacity, type]
+      properties:
+        name:
+          type: string
+          minLength: 2
+        address:
+          type: string
+          minLength: 5
+        capacity:
+          type: integer
+          minimum: 1
+        type:
+          type: string
+          enum: [APARTMENT, HOUSE, VILLA, STUDIO, ROOM, OTHER]
+        notes:
+          type: string
+
+    UpdatePropertyInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+        address:
+          type: string
+          minLength: 5
+        capacity:
+          type: integer
+          minimum: 1
+        type:
+          type: string
+          enum: [APARTMENT, HOUSE, VILLA, STUDIO, ROOM, OTHER]
+        notes:
+          type: string
+
+    ICalSource:
+      type: object
+      required: [id, name, url, syncIntervalMinutes]
+      properties:
+        id:
+          type: string
+          
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+        syncIntervalMinutes:
+          type: integer
+        lastSyncAt:
+          type: string
+          format: date-time
+          nullable: true
+        lastSyncStatus:
+          type: string
+          nullable: true
+        errorMessage:
+          type: string
+          nullable: true
+
+    CreateICalSourceInput:
+      type: object
+      required: [name, url]
+      properties:
+        name:
+          type: string
+          minLength: 2
+        url:
+          type: string
+          format: uri
+        syncIntervalMinutes:
+          type: integer
+          minimum: 15
+          maximum: 30
+
+    Reservation:
+      type: object
+      required: [id, propertyId, guestName, checkIn, checkOut, status, sourceType]
+      properties:
+        id:
+          type: string
+          
+        organizationId:
+          type: string
+          
+        propertyId:
+          type: string
+          
+        guestName:
+          type: string
+        checkIn:
+          type: string
+          format: date-time
+        checkOut:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [CONFIRMED, CANCELLED]
+        sourceType:
+          type: string
+          enum: [ICAL, MANUAL]
+        property:
+          $ref: '#/components/schemas/Property'
+
+    Task:
+      type: object
+      required: [id, status, propertyId, title, type]
+      properties:
+        id: { type: string }
+        status: { $ref: '#/components/schemas/TaskStatus' }
+        propertyId: { type: string }
+        property:
+          type: object
+          required: [id, name, colorIndex]
+          properties:
+            id: { type: string }
+            name: { type: string }
+            colorIndex: { type: integer }
+        title: { type: string }
+        type: { $ref: '#/components/schemas/TaskType' }
+        description: { type: string, nullable: true }
+        scheduledAt: { type: string, format: date-time, nullable: true }
+        assignedUserId: { type: string, nullable: true }
+        assignedUser:
+          type: object
+          nullable: true
+          required: [id, name]
+          properties:
+            id: { type: string }
+            name: { type: string }
+        durationMinutes: { type: integer, nullable: true }
+
+    TaskStatus:
+      type: string
+      enum: [TODO, IN_PROGRESS, COMPLETED, INCIDENT, PENDING_VALIDATION]
+
+    TaskType:
+      type: string
+      enum: [CLEANING, MAINTENANCE, INSPECTION, CHECK_IN, CHECK_OUT, TURNOVER, OTHER]
+
+    CreateTaskInput:
+      type: object
+      required: [propertyId, title, type]
+      properties:
+        propertyId: { type: string }
+        title: { type: string }
+        type: { $ref: '#/components/schemas/TaskType' }
+        description: { type: string }
+        scheduledAt: { type: string, format: date-time }
+        assignedUserId: { type: string }
+        durationMinutes: { type: integer }
+
+    User:
+      type: object
+      required: [id, name, email, role, hasAccount, isActive]
+      properties:
+        id: { type: string }
+        organizationId: { type: string, nullable: true }
+        name: { type: string }
+        email: { type: string }
+        role: { $ref: '#/components/schemas/Role' }
+        hasAccount: { type: boolean }
+        isActive: { type: boolean }
+        firstName: { type: string, nullable: true }
+        lastName: { type: string, nullable: true }
+        image: { type: string, nullable: true }
+
+    Role:
+      type: string
+      enum: [OWNER, ADMIN, MANAGER, STAFF_AUTONOMOUS, STAFF_MANAGED]
+
+    TeamMember:
+      type: object
+      required: [id, userId, organizationId, name, email, role, isActive, hasAccount]
+      properties:
+        id: { type: string }
+        userId: { type: string }
+        organizationId: { type: string }
+        name: { type: string }
+        email: { type: string }
+        role: { $ref: '#/components/schemas/Role' }
+        isActive: { type: boolean }
+        hasAccount: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        image: { type: string, nullable: true }
+
+    Notification:
+      type: object
+      required: [id, userId, type, title, body, createdAt]
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        organizationId:
+          type: string
+        type:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        data:
+          type: string
+          nullable: true
+        deepLink:
+          type: string
+          nullable: true
+        readAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    NotificationPreference:
+      type: object
+      required: [notificationType, channel, enabled]
+      properties:
+        notificationType:
+          type: string
+        channel:
+          type: string
+          enum: [IN_APP, EMAIL]
+        enabled:
+          type: boolean
+
+    CreateReservationInput:
+      type: object
+      required: [propertyId, guestName, checkIn, checkOut]
+      properties:
+        propertyId:
+          type: string
+          
+        guestName:
+          type: string
+          minLength: 1
+        checkIn:
+          type: string
+          format: date
+        checkOut:
+          type: string
+          format: date
+        notes:
+          type: string
+
+    HomeDashboard:
+      type: object
+      required: [greeting, kpis, pendingValidations, tasks, incidents, timeContext]
+      properties:
+        greeting: { type: string }
+        kpis:
+          type: array
+          items:
+            type: object
+            required: [label, value, color]
+            properties:
+              label: { type: string }
+              value: { type: number }
+              color: { type: string }
+        pendingValidations: { type: number }
+        tasks:
+          type: array
+          items:
+            type: object # Simplified Task for dashboard
+        incidents:
+          type: array
+          items:
+            type: object # Simplified Incident
+        timeContext:
+          type: string
+          enum: [morning, midday, evening]
+        contextMessage: { type: string }
+
+    FieldDashboard:
+      type: object
+      required: [taskCount, completedCount, zenState]
+      properties:
+        taskCount: { type: number }
+        completedCount: { type: number }
+        nextTask:
+          type: object
+          nullable: true
+        remainingTasks:
+          type: array
+          items: { type: object }
+        zenState:
+          type: string
+          enum: [zen_complete, zen_partial, attention]
+
+    ActivitySummary:
+      type: object
+      required: [date, tasksCompletedCount, tasksIncomplete, costs, comparison]
+      properties:
+        date: { type: string, format: date }
+        tasksCompletedCount: { type: number }
+        tasksIncomplete: { type: number }
+        costs:
+          type: object
+          required: [consumables, revenue, net]
+          properties:
+            consumables: { type: number }
+            revenue: { type: number }
+            net: { type: number }
+        comparison:
+          type: object
+          required: [delta, message]
+          properties:
+            delta: { type: number }
+            message: { type: string }
+
+    Asset:
+      type: object
+      required: [id, propertyId, name, category, purchaseDate, costCentimes]
+      properties:
+        id: { type: string }
+        propertyId: { type: string }
+        name: { type: string }
+        category: { type: string }
+        purchaseDate: { type: string, format: date-time }
+        costCentimes: { type: integer }
+        supplier: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    Revenue:
+      type: object
+      required: [id, propertyId, amountCentimes, date]
+      properties:
+        id: { type: string }
+        propertyId: { type: string }
+        amountCentimes: { type: integer }
+        date: { type: string, format: date-time }
+        source: { type: string }
+        notes: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    UpdateReservationInput:
+      type: object
+      properties:
+        guestName:
+          type: string
+          minLength: 1
+        checkIn:
+          type: string
+          format: date
+        checkOut:
+          type: string
+          format: date
+        notes:
+          type: string
+
+    ProblemDetails:
+      type: object
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+  responses:
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    UnprocessableEntity:
+      description: Validation error or business rule violation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'

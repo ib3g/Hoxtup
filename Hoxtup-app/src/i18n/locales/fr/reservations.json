@@ -1,0 +1,24 @@
+{
+  "title": "Réservations",
+  "create": "Nouvelle réservation",
+  "createManual": "Nouvelle réservation manuelle",
+  "empty": {
+    "title": "Aucune réservation",
+    "description": "Les réservations apparaîtront ici après une synchronisation iCal ou une création manuelle"
+  },
+  "fields": {
+    "property": "Propriété",
+    "propertySelect": "Sélectionner...",
+    "guestName": "Nom du client",
+    "guestNamePlaceholder": "Réservation directe",
+    "checkIn": "Date d'arrivée",
+    "checkOut": "Date de départ"
+  },
+  "badge": {
+    "manual": "Manuel",
+    "cancelled": "Annulée"
+  },
+  "cancel": "Annuler",
+  "cancelConfirm": "Annuler la réservation de {{name}} ?",
+  "creating": "Création..."
+}

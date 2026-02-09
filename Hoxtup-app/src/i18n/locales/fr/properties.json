@@ -1,0 +1,45 @@
+{
+  "title": "Propriétés",
+  "create": "Nouvelle propriété",
+  "empty": {
+    "title": "Aucune propriété",
+    "description": "Créez votre première propriété pour commencer"
+  },
+  "fields": {
+    "name": "Nom",
+    "address": "Adresse",
+    "type": "Type",
+    "status": "Statut",
+    "rooms": "Chambres",
+    "maxGuests": "Capacité max",
+    "description": "Description"
+  },
+  "type": {
+    "apartment": "Appartement",
+    "house": "Maison",
+    "villa": "Villa",
+    "studio": "Studio",
+    "room": "Chambre"
+  },
+  "status": {
+    "active": "Active",
+    "archived": "Archivée",
+    "maintenance": "En maintenance"
+  },
+  "profile": {
+    "noMembers": "Aucun membre assigné",
+    "membersCount": "{{count}} membre(s) assigné(s)"
+  },
+  "ical": {
+    "title": "Sources iCal",
+    "add": "Ajouter",
+    "empty": "Aucune source iCal connectée",
+    "sourceName": "Nom de la source",
+    "sourceNamePlaceholder": "Ex: Airbnb, Booking.com",
+    "url": "URL du calendrier iCal",
+    "urlPlaceholder": "https://...",
+    "interval": "Intervalle de sync (min)",
+    "validating": "Validation...",
+    "deleteConfirm": "Supprimer la source \"{{name}}\" ?"
+  }
+}

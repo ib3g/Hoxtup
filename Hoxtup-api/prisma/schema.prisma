@@ -1,0 +1,694 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MANAGER
+  STAFF_AUTONOMOUS
+  STAFF_MANAGED
+
+  @@map("role")
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  VILLA
+  STUDIO
+  ROOM
+  OTHER
+
+  @@map("property_type")
+}
+
+enum ReservationStatus {
+  CONFIRMED
+  CANCELLED
+
+  @@map("reservation_status")
+}
+
+enum SourceType {
+  ICAL
+  MANUAL
+
+  @@map("source_type")
+}
+
+enum TaskStatus {
+  PENDING_VALIDATION
+  TODO
+  IN_PROGRESS
+  COMPLETED
+  INCIDENT
+  FUSION_SUGGESTED
+  CANCELLED
+
+  @@map("task_status")
+}
+
+enum TaskType {
+  CLEANING
+  MAINTENANCE
+  INSPECTION
+  CHECK_IN
+  CHECK_OUT
+  TURNOVER
+  OTHER
+
+  @@map("task_type")
+}
+
+enum TriggerType {
+  BEFORE_ARRIVAL
+  AFTER_DEPARTURE
+  TURNOVER
+
+  @@map("trigger_type")
+}
+
+enum IncidentType {
+  EQUIPMENT
+  STOCK
+  CLEANLINESS
+  OTHER
+
+  @@map("incident_type")
+}
+
+model Organization {
+  id           String   @id @default(uuid(7))
+  name         String
+  slug         String   @unique
+  currencyCode String   @default("EUR") @map("currency_code")
+  timezone     String   @default("Europe/Paris")
+  logo         String?
+  metadata     String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  users         User[]
+  members       Member[]
+  invitations   Invitation[]
+  properties    Property[]
+  subscription  Subscription?
+  auditLogs     TeamAuditLog[]
+  notificationPreferences NotificationPreference[]
+
+  @@map("organizations")
+}
+
+model User {
+  id                String   @id @default(uuid(7))
+  organizationId    String?  @map("organization_id")
+  name              String
+  email             String
+  emailVerified     Boolean  @default(false) @map("email_verified")
+  image             String?
+  passwordHash      String?  @map("password_hash")
+  firstName         String?  @map("first_name")
+  lastName          String?  @map("last_name")
+  role              Role     @default(STAFF_MANAGED)
+  hasAccount        Boolean  @default(false) @map("has_account")
+  preferredLanguage String   @default("fr") @map("preferred_language")
+  isActive          Boolean  @default(true) @map("is_active")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sessions     Session[]
+  accounts     Account[]
+  members      Member[]
+  invitations  Invitation[]
+  assignedTasks Task[]
+
+  @@unique([organizationId, email], map: "users_org_email_unique")
+  @@index([organizationId], map: "users_organization_id_idx")
+  @@map("users")
+}
+
+model Session {
+  id                   String   @id
+  expiresAt            DateTime @map("expires_at")
+  token                String   @unique
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+  ipAddress            String?  @map("ip_address")
+  userAgent            String?  @map("user_agent")
+  userId               String   @map("user_id")
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activeOrganizationId String?  @map("active_organization_id")
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  userId                String    @map("user_id")
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  idToken               String?   @map("id_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at")
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model Member {
+  id             String       @id
+  organizationId String       @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String       @map("user_id")
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           String       @default("member")
+  createdAt      DateTime     @map("created_at")
+
+  @@index([organizationId])
+  @@index([userId])
+  @@map("member")
+}
+
+model PropertyAssignment {
+  id             String   @id @default(uuid(7))
+  organizationId String   @map("organization_id")
+  userId         String   @map("user_id")
+  propertyId     String   @map("property_id")
+  property       Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, propertyId])
+  @@index([organizationId])
+  @@index([userId])
+  @@index([propertyId])
+  @@map("property_assignments")
+}
+
+model TeamAuditLog {
+  id             String   @id @default(uuid(7))
+  organizationId String   @map("organization_id")
+  actorId        String   @map("actor_id")
+  targetId       String?  @map("target_id")
+  action         String
+  details        String?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([actorId])
+  @@index([targetId])
+  @@index([createdAt])
+  @@map("team_audit_logs")
+}
+
+model Property {
+  id             String       @id @default(uuid(7))
+  organizationId String       @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  address        String
+  capacity       Int          @default(1)
+  type           PropertyType @default(APARTMENT)
+  colorIndex     Int          @default(0) @map("color_index")
+  photoUrl       String?      @map("photo_url")
+  notes          String?
+  archivedAt     DateTime?    @map("archived_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  assignments  PropertyAssignment[]
+  icalSources  ICalSource[]
+  reservations Reservation[]
+  tasks        Task[]
+  autoRules    TaskAutoRule[]
+  consumables  ConsumableItem[]  @relation("PropertyConsumables")
+  assets       Asset[]           @relation("PropertyAssets")
+  revenues     Revenue[]         @relation("PropertyRevenue")
+
+  @@index([organizationId])
+  @@index([archivedAt])
+  @@map("properties")
+}
+
+model Reservation {
+  id             String            @id @default(uuid(7))
+  organizationId String            @map("organization_id")
+  propertyId     String            @map("property_id")
+  property       Property          @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  icalSourceId   String?           @map("ical_source_id")
+  icalUid        String?           @map("ical_uid")
+  guestName      String            @map("guest_name")
+  checkIn        DateTime          @map("check_in")
+  checkOut       DateTime          @map("check_out")
+  status         ReservationStatus @default(CONFIRMED)
+  sourceType     SourceType        @default(ICAL) @map("source_type")
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+
+  @@unique([icalSourceId, icalUid])
+  @@index([propertyId])
+  @@index([organizationId])
+  tasks        Task[]
+
+  @@index([checkIn, checkOut])
+  @@map("reservations")
+}
+
+model ICalSource {
+  id                  String    @id @default(uuid(7))
+  organizationId      String    @map("organization_id")
+  propertyId          String    @map("property_id")
+  property            Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  name                String
+  url                 String
+  syncIntervalMinutes Int       @default(15) @map("sync_interval_minutes")
+  lastSyncAt          DateTime? @map("last_sync_at")
+  lastSyncStatus      String?   @map("last_sync_status")
+  errorMessage        String?   @map("error_message")
+  createdAt           DateTime  @default(now()) @map("created_at")
+
+  @@index([propertyId])
+  @@index([organizationId])
+  @@map("ical_sources")
+}
+
+model Task {
+  id              String      @id @default(uuid(7))
+  organizationId  String      @map("organization_id")
+  propertyId      String      @map("property_id")
+  property        Property    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  reservationId   String?     @map("reservation_id")
+  reservation     Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  assignedUserId  String?     @map("assigned_user_id")
+  assignedUser    User?       @relation(fields: [assignedUserId], references: [id], onDelete: SetNull)
+  autoRuleId      String?     @map("auto_rule_id")
+  autoRule        TaskAutoRule? @relation(fields: [autoRuleId], references: [id], onDelete: SetNull)
+  title           String
+  description     String?
+  type            TaskType    @default(OTHER)
+  status          TaskStatus  @default(PENDING_VALIDATION)
+  scheduledAt     DateTime?   @map("scheduled_at")
+  startedAt       DateTime?   @map("started_at")
+  completedAt     DateTime?   @map("completed_at")
+  durationMinutes Int?        @map("duration_minutes")
+  note            String?
+  fusionPairId    String?     @map("fusion_pair_id")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  history TaskHistory[]
+  incidents Incident[]
+
+  @@index([organizationId])
+  @@index([propertyId])
+  @@index([reservationId])
+  @@index([assignedUserId])
+  @@index([status])
+  @@index([autoRuleId])
+  @@index([fusionPairId])
+  @@map("tasks")
+}
+
+model TaskHistory {
+  id             String     @id @default(uuid(7))
+  organizationId String     @map("organization_id")
+  taskId         String     @map("task_id")
+  task           Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  fromStatus     TaskStatus @map("from_status")
+  toStatus       TaskStatus @map("to_status")
+  actorId        String     @map("actor_id")
+  note           String?
+  isProxy        Boolean    @default(false) @map("is_proxy")
+  onBehalfOfId   String?    @map("on_behalf_of_id")
+  createdAt      DateTime   @default(now()) @map("created_at")
+
+  @@index([organizationId])
+  @@index([taskId])
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("task_history")
+}
+
+model ReservationTaskAudit {
+  id             String   @id @default(uuid(7))
+  organizationId String   @map("organization_id")
+  reservationId String   @map("reservation_id")
+  taskId        String   @map("task_id")
+  action        String
+  oldCheckIn    DateTime? @map("old_check_in")
+  oldCheckOut   DateTime? @map("old_check_out")
+  newCheckIn    DateTime? @map("new_check_in")
+  newCheckOut   DateTime? @map("new_check_out")
+  source        String
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([organizationId])
+  @@index([reservationId])
+  @@index([taskId])
+  @@index([createdAt])
+  @@map("reservation_task_audits")
+}
+
+model TaskConflict {
+  id             String   @id @default(uuid(7))
+  organizationId String   @map("organization_id")
+  taskAId        String   @map("task_a_id")
+  taskBId        String   @map("task_b_id")
+  conflictType   String   @map("conflict_type") // PROPERTY, STAFF
+  status         String   @default("detected") // detected, acknowledged, resolved
+  acknowledgedAt DateTime? @map("acknowledged_at")
+  resolution     String?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@unique([organizationId, taskAId, taskBId], map: "task_conflicts_org_task_a_task_b_unique")
+  @@index([organizationId])
+  @@index([status])
+  @@map("task_conflicts")
+}
+
+model Incident {
+  id             String       @id @default(uuid(7))
+  organizationId String       @map("organization_id")
+  taskId         String       @map("task_id")
+  reporterId     String       @map("reporter_id")
+  type           IncidentType
+  photoUrl       String?      @map("photo_url")
+  description    String?
+  status         String       @default("open") // open, resolved
+  resolution     String?
+  resolvedById   String?      @map("resolved_by_id")
+  resolvedAt     DateTime?    @map("resolved_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  task           Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([taskId])
+  @@index([reporterId])
+  @@index([status])
+  @@map("incidents")
+}
+
+model FusionPair {
+  id              String   @id @default(uuid(7))
+  organizationId  String   @map("organization_id")
+  propertyId      String   @map("property_id")
+  taskAId         String   @map("task_a_id")
+  taskBId         String   @map("task_b_id")
+  status          String   @default("pending") // pending, accepted, rejected, withdrawn
+  mergedTaskId    String?  @map("merged_task_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  resolvedAt      DateTime? @map("resolved_at")
+
+  @@unique([organizationId, taskAId, taskBId], map: "fusion_pairs_org_task_a_task_b_unique")
+  @@index([organizationId])
+  @@index([status])
+  @@map("fusion_pairs")
+}
+
+model FusionRejection {
+  id             String   @id @default(uuid(7))
+  organizationId String   @map("organization_id")
+  taskAId        String   @map("task_a_id")
+  taskBId        String   @map("task_b_id")
+  rejectedAt     DateTime @default(now()) @map("rejected_at")
+
+  @@unique([organizationId, taskAId, taskBId], map: "fusion_rejections_org_task_a_task_b_unique")
+  @@index([organizationId])
+  @@map("fusion_rejections")
+}
+
+model TaskAutoRule {
+  id                String      @id @default(uuid(7))
+  organizationId    String      @map("organization_id")
+  propertyId        String      @map("property_id")
+  property          Property    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  triggerType       TriggerType @map("trigger_type")
+  taskType          TaskType    @default(CLEANING) @map("task_type")
+  titleTemplate     String      @map("title_template")
+  timeOffsetHours   Int         @default(0) @map("time_offset_hours")
+  durationMinutes   Int         @default(60) @map("duration_minutes")
+  enabled           Boolean     @default(false)
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+
+  tasks Task[]
+
+  @@unique([propertyId, triggerType])
+  @@index([organizationId])
+  @@index([propertyId])
+  @@map("task_auto_rules")
+}
+
+enum NotificationType {
+  RESERVATION_CREATED
+  TASK_ASSIGNED
+  TASK_OVERDUE
+  TASK_COMPLETED
+  INCIDENT_REPORTED
+  STOCK_ALERT
+  ICAL_SYNC_FAILURE
+
+  @@map("notification_type")
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+
+  @@map("notification_channel")
+}
+
+model Notification {
+  id             String           @id @default(uuid(7))
+  organizationId String           @map("organization_id")
+  userId         String           @map("user_id")
+  type           NotificationType
+  title          String
+  body           String
+  data           String?          // JSON payload
+  deepLink       String?          @map("deep_link")
+  readAt         DateTime?        @map("read_at")
+  createdAt      DateTime         @default(now()) @map("created_at")
+
+  @@index([userId, readAt])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id               String              @id @default(uuid(7))
+  organizationId   String              @map("organization_id")
+  userId           String              @map("user_id")
+  notificationType NotificationType    @map("notification_type")
+  channel          NotificationChannel
+  enabled          Boolean             @default(true)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId, notificationType, channel], map: "notification_preferences_org_user_type_channel_unique")
+  @@index([organizationId])
+  @@index([userId])
+  @@map("notification_preferences")
+}
+
+enum ConsumableCategory {
+  GUEST_KIT
+  CLEANING_KIT
+  OTHER
+
+  @@map("consumable_category")
+}
+
+enum MovementType {
+  ENTRY
+  EXIT
+
+  @@map("movement_type")
+}
+
+enum AssetCategory {
+  LINENS
+  FURNITURE
+  APPLIANCES
+  ELECTRONICS
+  KITCHENWARE
+  OUTDOOR
+  OTHER
+
+  @@map("asset_category")
+}
+
+enum RevenueSource {
+  AIRBNB
+  BOOKING
+  DIRECT
+  OTHER
+
+  @@map("revenue_source")
+}
+
+model ConsumableItem {
+  id                     String             @id @default(uuid(7))
+  organizationId         String             @map("organization_id")
+  propertyId             String             @map("property_id")
+  property               Property           @relation("PropertyConsumables", fields: [propertyId], references: [id], onDelete: Cascade)
+  name                   String
+  category               ConsumableCategory @default(OTHER)
+  unit                   String             @default("unité")
+  currentQuantity        Int                @default(0) @map("current_quantity")
+  threshold              Int                @default(5)
+  costPerUnit            Int?               @map("cost_per_unit") // centimes
+  estimatedPerReservation Int?              @map("estimated_per_reservation")
+  createdAt              DateTime           @default(now()) @map("created_at")
+  updatedAt              DateTime           @updatedAt @map("updated_at")
+
+  movements StockMovement[]
+
+  @@index([organizationId])
+  @@index([propertyId])
+  @@map("consumable_items")
+}
+
+model StockMovement {
+  id             String       @id @default(uuid(7))
+  organizationId String       @map("organization_id")
+  itemId         String       @map("item_id")
+  item           ConsumableItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  type           MovementType
+  quantity       Int
+  costCentimes  Int?         @map("cost_centimes")
+  reason        String?
+  note          String?
+  taskId        String?      @map("task_id")
+  recordedById  String       @map("recorded_by_id")
+  recordedAt    DateTime     @default(now()) @map("recorded_at")
+
+  @@index([organizationId])
+  @@index([itemId])
+  @@index([recordedAt])
+  @@index([taskId])
+  @@map("stock_movements")
+}
+
+model Asset {
+  id             String        @id @default(uuid(7))
+  organizationId String        @map("organization_id")
+  propertyId     String        @map("property_id")
+  property       Property      @relation("PropertyAssets", fields: [propertyId], references: [id], onDelete: Cascade)
+  name           String
+  category       AssetCategory @default(OTHER)
+  purchaseDate   DateTime      @map("purchase_date")
+  costCentimes   Int           @map("cost_centimes")
+  supplier       String?
+  notes          String?
+  deletedAt      DateTime?     @map("deleted_at")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  @@index([organizationId])
+  @@index([propertyId])
+  @@index([category])
+  @@map("assets")
+}
+
+model Revenue {
+  id             String        @id @default(uuid(7))
+  organizationId String        @map("organization_id")
+  propertyId     String        @map("property_id")
+  property       Property      @relation("PropertyRevenue", fields: [propertyId], references: [id], onDelete: Cascade)
+  amountCentimes Int           @map("amount_centimes")
+  date           DateTime
+  source         RevenueSource @default(OTHER)
+  notes          String?
+  createdAt      DateTime      @default(now()) @map("created_at")
+
+  @@index([organizationId])
+  @@index([propertyId])
+  @@index([date])
+  @@map("revenues")
+}
+
+model Invitation {
+  id             String       @id
+  organizationId String       @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email          String
+  role           String?
+  status         String       @default("pending")
+  expiresAt      DateTime     @map("expires_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  inviterId      String       @map("inviter_id")
+  user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([email])
+  @@map("invitation")
+}
+
+enum PlanTier {
+  FREE
+  STARTER
+  PRO
+  SCALE
+  AGENCY
+
+  @@map("plan_tier")
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  ARCHIVED
+
+  @@map("subscription_status")
+}
+
+model Subscription {
+  id                    String             @id @default(uuid(7))
+  organizationId        String             @unique @map("organization_id")
+  organization          Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  polarCustomerId       String?            @map("polar_customer_id")
+  polarSubscriptionId   String?            @map("polar_subscription_id")
+  planTier              PlanTier           @default(FREE) @map("plan_tier")
+  status                SubscriptionStatus @default(TRIALING)
+  trialEnd              DateTime?          @map("trial_end")
+  currentPeriodEnd      DateTime?          @map("current_period_end")
+  cancelledAt           DateTime?          @map("cancelled_at")
+  archivedAt            DateTime?          @map("archived_at")
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@map("subscriptions")
+}

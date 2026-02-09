@@ -1,0 +1,14 @@
+{
+  "title": "Inventaire",
+  "stock": "Stock",
+  "assets": "Équipements",
+  "fields": {
+    "name": "Nom",
+    "quantity": "Quantité",
+    "unit": "Unité",
+    "threshold": "Seuil d'alerte",
+    "cost": "Coût unitaire"
+  },
+  "lowStock": "Stock bas",
+  "outOfStock": "Rupture de stock"
+}

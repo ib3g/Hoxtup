@@ -1,0 +1,49 @@
+{
+  "title": "Paramètres",
+  "profile": {
+    "title": "Profil",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Email",
+    "avatar": "Photo de profil"
+  },
+  "organization": {
+    "title": "Organisation",
+    "name": "Nom",
+    "currency": "Devise",
+    "timezone": "Fuseau horaire"
+  },
+  "language": {
+    "title": "Langue",
+    "select": "Sélectionner la langue",
+    "fr": "Français",
+    "en": "English",
+    "ar": "العربية"
+  },
+  "team": {
+    "title": "Équipe",
+    "invite": "Inviter un membre",
+    "members": "Membres",
+    "roles": {
+      "owner": "Propriétaire",
+      "admin": "Administrateur",
+      "manager": "Gestionnaire",
+      "staff_autonomous": "Staff autonome",
+      "staff_managed": "Staff géré"
+    },
+    "remove": "Retirer",
+    "deactivate": "Désactiver",
+    "confirmRemove": "Désactiver {{name}} ? Ses données seront conservées.",
+    "email": "Email",
+    "role": "Rôle",
+    "roleOf": "Rôle de {{name}}",
+    "name": "Nom",
+    "actions": "Actions",
+    "sending": "Envoi...",
+    "send": "Envoyer",
+    "inviteFailed": "Échec de l'envoi de l'invitation",
+    "updateFailed": "Échec de la mise à jour du rôle",
+    "removeFailed": "Échec du retrait du membre",
+    "empty": "Aucun membre pour le moment. Invitez quelqu'un pour commencer."
+  }
+}

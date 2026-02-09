@@ -1,0 +1,13 @@
+{
+  "title": "Facturation",
+  "plan": {
+    "free": "Gratuit",
+    "starter": "Starter",
+    "pro": "Pro",
+    "enterprise": "Entreprise"
+  },
+  "subscription": "Abonnement",
+  "invoices": "Factures",
+  "upgrade": "Mettre à niveau",
+  "cancel": "Annuler l'abonnement"
+}

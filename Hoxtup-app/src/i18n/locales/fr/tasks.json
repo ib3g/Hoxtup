@@ -65,5 +65,29 @@
   "allTasks": "Toutes les tâches",
   "filterByProperty": "Filtrer par propriété",
   "filterByStatus": "Filtrer par statut",
-  "noProperty": "Toutes"
+  "noProperty": "Toutes",
+  "form": {
+    "createTitle": "Nouvelle tâche",
+    "editTitle": "Modifier la tâche",
+    "title": "Titre",
+    "titlePlaceholder": "ex: Ménage après départ",
+    "description": "Description",
+    "descriptionPlaceholder": "Détails de la tâche...",
+    "type": "Type",
+    "property": "Propriété",
+    "scheduledAt": "Date planifiée",
+    "submit": "Enregistrer",
+    "creating": "Création...",
+    "error": {
+      "titleRequired": "Titre requis",
+      "propertyRequired": "Propriété requise",
+      "generic": "Erreur lors de l'enregistrement"
+    },
+    "success": {
+      "created": "Tâche créée",
+      "updated": "Tâche mise à jour"
+    }
+  },
+  "todayCount": "{{count}} tâche(s) aujourd'hui",
+  "inProgressCount": "{{count}} en cours"
 }

@@ -170,6 +170,55 @@
 
 ---
 
+## UX / Onboarding
+
+### 2026-02 — Auto-création org "default" à l'inscription
+
+**Décision :** L'organisation est créée automatiquement (name: "default") lors du signup. L'utilisateur ne voit jamais un écran de création d'organisation.
+
+**Contexte :** Réduire la friction post-signup. L'utilisateur veut gérer ses propriétés, pas configurer une organisation. Le nom peut être modifié plus tard dans les settings.
+
+**Alternatives rejetées :**
+- Écran dédié "Créer votre agence" : une étape de plus avant d'être productif. Testé, abandonné.
+
+### 2026-02 — Onboarding depuis le dashboard, pas en flow forcé
+
+**Décision :** L'onboarding (créer propriété + iCal) est accessible via un CTA dans le dashboard quand 0 propriété existe. Ce n'est pas un flow bloquant post-signup.
+
+**Contexte :** Moins de friction. L'utilisateur arrive directement sur le dashboard et voit un empty state avec "Ajouter ma première propriété". Il peut explorer l'UI avant de créer.
+
+### 2026-02 — Pas de dark mode
+
+**Décision :** L'app est light-only. Pas de `dark:` prefixes, pas de variables CSS dark theme, pas de toggle.
+
+**Contexte :** Solo dev, priorité au MVP. Le design system Fusion Méditerranée est optimisé pour le light mode. Dark mode ajouterait de la complexité sans valeur pour le lancement.
+
+---
+
+## Auth (compléments)
+
+### 2026-02 — Better Auth CORS : headers manuels avant toNodeHandler
+
+**Décision :** Les headers CORS sont injectés manuellement avant `toNodeHandler(auth)` dans `app.ts`. Le middleware Express `cors()` ne suffit pas pour les routes Better Auth.
+
+**Contexte :** `toNodeHandler()` prend le contrôle complet de la réponse HTTP Node.js et écrase les headers posés par le middleware Express cors. Les requêtes cross-origin (frontend sur `:3000`, API sur `:8000`) échouent avec "CORS error, status null".
+
+**Fix :** Wrapper dans `app.all('/api/auth/*splat')` qui pose `Access-Control-Allow-Origin`, `Credentials`, `Methods`, `Headers` avant de déléguer à `toNodeHandler`. Les `OPTIONS` preflight sont interceptés et répondus en 204.
+
+### 2026-02 — Auth middleware : fallback auto-activation de la première org
+
+**Décision :** Si `activeOrganizationId` est null dans la session, le middleware cherche la première org de l'utilisateur via `auth.api.listOrganizations()` et l'utilise.
+
+**Contexte :** `organization.setActive()` côté client ne persiste pas toujours le `activeOrganizationId` dans la session (timing, cookies). Le fallback évite des 403 systématiques sur les routes protégées.
+
+### 2026-02 — auth-client.ts doit avoir 'use client'
+
+**Décision :** Le fichier `auth-client.ts` qui importe `better-auth/react` doit être marqué `'use client'`.
+
+**Contexte :** `createAuthClient` de `better-auth/react` crée des hooks React (`useSession`, `useActiveOrganization`). Sans `'use client'`, Next.js peut évaluer ce module côté serveur pendant le SSR, provoquant `Cannot read properties of null (reading 'useRef')`.
+
+---
+
 ## Testing
 
 ### 2026-01 — vitest avec testTimeout 15000ms

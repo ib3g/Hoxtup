@@ -1,8 +1,16 @@
 {
   "title": "Notifications",
   "markAllRead": "Tout marquer comme lu",
+  "allRead": "Tout est lu",
   "empty": "Aucune notification",
+  "emptyDescription": "Vous recevrez des notifications pour les tâches, réservations et incidents.",
   "preferences": "Préférences de notification",
+  "timeAgo": {
+    "justNow": "À l'instant",
+    "minutes": "Il y a {{count}} min",
+    "hours": "Il y a {{count}}h",
+    "days": "Il y a {{count}}j"
+  },
   "channels": {
     "email": "Email",
     "push": "Notification push",

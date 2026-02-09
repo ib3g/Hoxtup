@@ -20,6 +20,18 @@
     "en": "English",
     "ar": "العربية"
   },
+  "save": "Enregistrer",
+  "saving": "Enregistrement...",
+  "saved": "Enregistré",
+  "role": "Rôle",
+  "preferences": {
+    "title": "Préférences",
+    "language": "Langue",
+    "timezone": "Fuseau horaire"
+  },
+  "logout": "Se déconnecter",
+  "logoutConfirm": "Êtes-vous sûr de vouloir vous déconnecter ?",
+  "cancel": "Annuler",
   "team": {
     "title": "Équipe",
     "invite": "Inviter un membre",

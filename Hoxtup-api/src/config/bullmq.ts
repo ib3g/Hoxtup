@@ -1,12 +1,9 @@
 import { Queue } from 'bullmq'
-import { Redis } from 'ioredis'
+import { redis } from './redis.js'
 
-const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:6379'
-const connection = new Redis(redisUrl, { maxRetriesPerRequest: null })
-
-export const icalSyncQueue = new Queue('ical-sync', { connection })
+export const icalSyncQueue = new Queue('ical-sync', { connection: redis })
 export const notificationsQueue = new Queue('notifications', { 
-  connection,
+  connection: redis,
   defaultJobOptions: {
     attempts: 3,
     backoff: {
@@ -19,7 +16,7 @@ export const notificationsQueue = new Queue('notifications', {
 })
 
 export const emailsQueue = new Queue('emails', {
-  connection,
+  connection: redis,
   defaultJobOptions: {
     attempts: 3,
     backoff: {
@@ -30,5 +27,3 @@ export const emailsQueue = new Queue('emails', {
     removeOnFail: { count: 500 },
   }
 })
-
-export { connection as redisConnection }

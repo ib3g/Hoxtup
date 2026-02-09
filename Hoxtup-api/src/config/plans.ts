@@ -19,9 +19,9 @@ export const PLANS: Record<PlanTier, PlanConfig> = {
   STARTER: {
     tier: 'STARTER',
     price: 6900,
-    maxProperties: 5,
+    maxProperties: 7,
     polarProductId: process.env.POLAR_PRODUCT_STARTER ?? 'polar_prod_starter',
-    features: ['5 propriétés', 'Équipe illimitée', 'Notifications', 'iCal sync'],
+    features: ['2-7 propriétés', 'Équipe illimitée', 'Notifications', 'iCal sync'],
   },
   PRO: {
     tier: 'PRO',
@@ -33,9 +33,9 @@ export const PLANS: Record<PlanTier, PlanConfig> = {
   SCALE: {
     tier: 'SCALE',
     price: 39900,
-    maxProperties: 50,
+    maxProperties: 25,
     polarProductId: process.env.POLAR_PRODUCT_SCALE ?? 'polar_prod_scale',
-    features: ['50 propriétés', 'API accès', 'Support prioritaire'],
+    features: ['16-25 propriétés', 'API accès', 'Support prioritaire'],
   },
   AGENCY: {
     tier: 'AGENCY',

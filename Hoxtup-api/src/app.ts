@@ -9,6 +9,7 @@ import { createCorsOptions } from './config/cors.js'
 import { logger } from './config/logger.js'
 import { propertiesRouter } from './modules/properties/routes.js'
 import { icalRouter } from './modules/ical/routes.js'
+import { reservationsRouter } from './modules/reservations/routes.js'
 
 export function createApp() {
   const app = express()
@@ -41,6 +42,7 @@ export function createApp() {
 
   app.use('/api/v1/properties', propertiesRouter)
   app.use('/api/v1/properties/:propertyId/ical-sources', icalRouter)
+  app.use('/api/v1/reservations', reservationsRouter)
 
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() })

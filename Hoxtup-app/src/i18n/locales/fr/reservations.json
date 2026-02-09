@@ -12,13 +12,57 @@
     "guestName": "Nom du client",
     "guestNamePlaceholder": "Réservation directe",
     "checkIn": "Date d'arrivée",
-    "checkOut": "Date de départ"
+    "checkOut": "Date de départ",
+    "source": "Source",
+    "status": "Statut",
+    "notes": "Notes",
+    "notesPlaceholder": "Notes internes..."
+  },
+  "status": {
+    "confirmed": "Confirmée",
+    "cancelled": "Annulée"
+  },
+  "source": {
+    "ICAL": "iCal",
+    "MANUAL": "Manuel"
+  },
+  "filter": {
+    "all": "Toutes",
+    "confirmed": "Confirmées",
+    "cancelled": "Annulées",
+    "allProperties": "Toutes les propriétés"
   },
   "badge": {
     "manual": "Manuel",
+    "ical": "iCal",
     "cancelled": "Annulée"
   },
   "cancel": "Annuler",
-  "cancelConfirm": "Annuler la réservation de {{name}} ?",
+  "cancelDialog": {
+    "title": "Annuler cette réservation ?",
+    "description": "La réservation de \"{{name}}\" sera annulée.",
+    "confirm": "Annuler la réservation",
+    "cancel": "Retour"
+  },
+  "form": {
+    "createTitle": "Nouvelle réservation",
+    "editTitle": "Modifier la réservation",
+    "submit": "Enregistrer",
+    "creating": "Création...",
+    "updating": "Mise à jour...",
+    "error": {
+      "propertyRequired": "Propriété requise",
+      "guestRequired": "Nom du client requis",
+      "checkInRequired": "Date d'arrivée requise",
+      "checkOutRequired": "Date de départ requise",
+      "generic": "Erreur lors de l'enregistrement"
+    },
+    "success": {
+      "created": "Réservation créée",
+      "updated": "Réservation mise à jour",
+      "cancelled": "Réservation annulée"
+    }
+  },
+  "nights": "{{count}} nuit(s)",
   "creating": "Création..."
 }

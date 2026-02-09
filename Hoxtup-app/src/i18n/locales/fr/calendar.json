@@ -6,5 +6,19 @@
     "month": "Mois"
   },
   "today": "Aujourd'hui",
-  "noEvents": "Aucun événement"
+  "prev": "Précédent",
+  "next": "Suivant",
+  "noEvents": "Aucun événement",
+  "allProperties": "Toutes les propriétés",
+  "reservation": "Réservation",
+  "task": "Tâche",
+  "days": {
+    "mon": "Lun",
+    "tue": "Mar",
+    "wed": "Mer",
+    "thu": "Jeu",
+    "fri": "Ven",
+    "sat": "Sam",
+    "sun": "Dim"
+  }
 }

@@ -11,6 +11,7 @@ import { propertiesRouter } from './modules/properties/routes.js'
 import { icalRouter } from './modules/ical/routes.js'
 import { reservationsRouter } from './modules/reservations/routes.js'
 import { tasksRouter } from './modules/tasks/routes.js'
+import { teamRouter } from './modules/team/routes.js'
 
 export function createApp() {
   const app = express()
@@ -45,6 +46,7 @@ export function createApp() {
   app.use('/api/v1/properties/:propertyId/ical-sources', icalRouter)
   app.use('/api/v1/reservations', reservationsRouter)
   app.use('/api/v1/tasks', tasksRouter)
+  app.use('/api/v1/team', teamRouter)
 
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() })

@@ -3,12 +3,13 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, CalendarDays, User, FileText, Clock, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, CalendarDays, User, FileText, Clock, AlertTriangle, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PropertyColorDot } from '@/components/property-color-dot'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
@@ -51,6 +52,8 @@ export default function TaskDetailPage() {
 
   const [task, setTask] = useState<Task | null>(null)
   const [loading, setLoading] = useState(true)
+  const [assignOpen, setAssignOpen] = useState(false)
+  const [members, setMembers] = useState<{ id: string; userId: string; role: string; user: { id: string; name: string; email: string } }[]>([])
 
   const fetchTask = useCallback(() => {
     setLoading(true)
@@ -62,6 +65,13 @@ export default function TaskDetailPage() {
   }, [id])
 
   useEffect(() => { fetchTask() }, [fetchTask])
+
+  useEffect(() => {
+    fetch(`${API_URL}/team`, { credentials: 'include' })
+      .then((r) => r.ok ? r.json() : [])
+      .then(setMembers)
+      .catch(() => setMembers([]))
+  }, [])
 
   async function transition(newStatus: string) {
     const prev = task
@@ -179,6 +189,10 @@ export default function TaskDetailPage() {
             {t('actions.resolveComplete')}
           </Button>
         )}
+        <Button variant="secondary" className="w-full sm:w-auto" onClick={() => setAssignOpen(true)}>
+          <UserPlus className="size-4 mr-1" />
+          {task.assignedUser ? t('assignTo') : t('assign')}
+        </Button>
       </div>
 
       {/* Task info card */}
@@ -245,6 +259,44 @@ export default function TaskDetailPage() {
           )}
         </CardContent>
       </Card>
+
+      <Sheet open={assignOpen} onOpenChange={setAssignOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-sm">
+          <SheetHeader>
+            <SheetTitle>{t('assignTo')}</SheetTitle>
+          </SheetHeader>
+          <div className="mt-4 space-y-2">
+            {members.map((m) => (
+              <button
+                key={m.id}
+                onClick={async () => {
+                  const res = await fetch(`${API_URL}/tasks/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ assignedUserId: m.user.id }),
+                  })
+                  if (res.ok) {
+                    const updated = await res.json()
+                    setTask(updated)
+                    setAssignOpen(false)
+                    toast.success(`${t('assigned')} → ${m.user.name}`)
+                  }
+                }}
+                className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors text-left"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary text-sm font-medium">
+                  {m.user.name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-label">{m.user.name}</p>
+                  <p className="text-micro text-muted-foreground">{m.role}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }

@@ -1,6 +1,16 @@
 {
   "greeting": "Bonjour, {{name}}",
+  "greetingAfternoon": "Bon après-midi, {{name}}",
+  "greetingEvening": "Bonsoir, {{name}}",
   "title": "Tableau de bord",
+  "today": "Aujourd'hui",
+  "context": {
+    "tasksToAssign": "{{count}} tâche(s) à assigner",
+    "allReady": "Tout est prêt pour aujourd'hui",
+    "alertsToHandle": "{{count}} alerte(s) à traiter",
+    "dayComplete": "Journée complète ✓",
+    "welcome": "Bienvenue sur Hoxtup"
+  },
   "kpi": {
     "occupancy": "Taux d'occupation",
     "revenue": "Revenus",
@@ -14,7 +24,8 @@
     "viewCalendar": "Voir le calendrier"
   },
   "empty": {
-    "title": "Commencez par ajouter une propriété",
-    "description": "Créez votre première propriété pour organiser votre portefeuille"
+    "title": "Bienvenue sur Hoxtup !",
+    "description": "Créez votre première propriété pour commencer à gérer vos locations",
+    "cta": "Ajouter ma première propriété"
   }
 }

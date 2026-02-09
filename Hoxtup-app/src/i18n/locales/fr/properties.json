@@ -41,5 +41,51 @@
     "interval": "Intervalle de sync (min)",
     "validating": "Validation...",
     "deleteConfirm": "Supprimer la source \"{{name}}\" ?"
+  },
+  "onboarding": {
+    "step1": "Propriété",
+    "step2": "Calendrier",
+    "step3": "Confirmation",
+    "createProperty": {
+      "title": "Créez votre première propriété",
+      "subtitle": "Les informations de base de votre logement",
+      "name": "Nom du logement",
+      "namePlaceholder": "ex: Appartement Marrakech",
+      "address": "Adresse",
+      "addressPlaceholder": "ex: 12 rue des Oliviers, 40000 Marrakech",
+      "type": "Type de logement",
+      "color": "Couleur",
+      "submit": "Continuer",
+      "error": {
+        "nameRequired": "Nom requis",
+        "addressRequired": "Adresse requise",
+        "generic": "Erreur lors de la création"
+      }
+    },
+    "connectIcal": {
+      "title": "Connectez votre calendrier",
+      "subtitle": "Importez automatiquement vos réservations depuis Airbnb ou Booking",
+      "explanation": "Collez l'URL iCal de votre annonce. Vous la trouverez dans les paramètres de votre annonce sur la plateforme.",
+      "name": "Nom de la source",
+      "namePlaceholder": "ex: Airbnb",
+      "url": "URL du calendrier iCal",
+      "urlPlaceholder": "https://www.airbnb.com/calendar/ical/...",
+      "submit": "Connecter",
+      "skip": "Passer cette étape",
+      "syncing": "Synchronisation en cours...",
+      "error": {
+        "nameRequired": "Nom requis",
+        "urlInvalid": "URL invalide",
+        "generic": "Erreur lors de la connexion"
+      }
+    },
+    "confirmation": {
+      "title": "Votre propriété est prête !",
+      "subtitle": "Tout est configuré, vous pouvez commencer à utiliser Hoxtup",
+      "propertyName": "Propriété",
+      "icalConnected": "Calendrier connecté",
+      "icalSkipped": "Calendrier non connecté",
+      "goToDashboard": "Voir mon tableau de bord"
+    }
   }
 }

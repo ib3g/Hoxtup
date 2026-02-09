@@ -10,8 +10,8 @@
 | Métrique | Valeur |
 |:---|:---|
 | **Phase actuelle** | Phase 1 — MVP |
-| **Story en cours** | — (pas commencé) |
-| **Stories terminées** | 0 / 17 |
+| **Story en cours** | mvp-05 (Properties List & Detail) |
+| **Stories terminées** | 4 / 17 |
 | **Dernière mise à jour** | 2026-02-09 |
 
 ---
@@ -20,10 +20,10 @@
 
 | # | Story | Scope | Status | Notes |
 |:---|:---|:---|:---|:---|
-| mvp-01 | Design System & Tokens | Frontend | ⬜ Todo | |
-| mvp-02 | App Shell & Navigation | Frontend | ⬜ Todo | Dépend de mvp-01 |
-| mvp-03 | Auth Pages | Backend + Frontend | ⬜ Todo | Dépend de mvp-01, mvp-02 |
-| mvp-04 | Onboarding Flow | Backend + Frontend | ⬜ Todo | Dépend de mvp-03 |
+| mvp-01 | Design System & Tokens | Frontend | ✅ Done | Session 2 |
+| mvp-02 | App Shell & Navigation | Frontend | ✅ Done | Session 2 |
+| mvp-03 | Auth Pages | Backend + Frontend | ✅ Done | Session 2 |
+| mvp-04 | Onboarding Flow | Backend + Frontend | ✅ Done | Session 3 |
 | mvp-05 | Properties List & Detail | Backend + Frontend | ⬜ Todo | Dépend de mvp-02 |
 | mvp-06 | Reservations List | Backend + Frontend | ⬜ Todo | Dépend de mvp-05 |
 | mvp-07 | iCal Management | Backend + Frontend | ⬜ Todo | Dépend de mvp-05 |
@@ -65,29 +65,119 @@
 
 **Prochaine session :** Commencer mvp-01 (Design System & Tokens)
 
+### Session 2 — 2026-02-09
+
+**Objectif :** Implémenter mvp-01 (Design System & Tokens)
+
+**Réalisé :**
+- Tailwind v4 `globals.css` rewritten : brand tokens, status colors, property slots, typography utilities, accessibility (focus ring, skip-to-content, reduced-motion, high-contrast)
+- Fonts Inter + Outfit chargées via `next/font/google` (auto self-hosted, subset, swap)
+- Root `layout.tsx` : CSS variables on `<html>`, I18nProvider, viewport meta, `lang="fr"`
+- shadcn/ui components installés : button, card, badge, dialog, sheet, skeleton, input, label, select, textarea, sonner
+- Button customisé : 4 variantes Hoxtup (terra CTA, teal secondary outline, ghost, destructive), h-12 touch targets
+- Sonner toaster fixé (removed next-themes dep)
+- Dialog fixé (outline → ghost variant)
+- Deps ajoutées : @tanstack/react-query, zustand, framer-motion
+- Page preview design system (typographie, couleurs, boutons, formulaire, skeleton)
+- Build passes ✅
+
+**mvp-02 — App Shell & Navigation :**
+- `AuthGuard` component : redirige vers `/login` si pas de session, skeleton loading
+- `BottomNavBar` : 4 tabs owner, 3 tabs staff, badge support, terra active, sticky bottom, touch targets 48px
+- `Sidebar` : immersive `#1e2d35` bg, collapsible, V1 badge sur Inventory, role-filtered items
+- `DashboardHeader` : greeting adaptatif (matin/après-midi/soir), date formatée FR
+- `useNavItems(role)` hook : retourne bottomNav + sidebarNav filtrés par rôle (5 rôles)
+- `DashboardShell` : client component wrapping AuthGuard + Sidebar + BottomNavBar + Header
+- `Providers` : QueryClient (TanStack Query) + Sonner Toaster
+- Dashboard layout : server component wrapper avec `dynamic = 'force-dynamic'`
+- 10 placeholder pages (dashboard, properties, reservations, tasks, calendar, team, settings, billing, incidents, more) + login
+- i18n : 19 nav keys ajoutés dans common.json, 5 contextual messages dans dashboard.json
+- Build passes ✅
+
+**Décisions prises :**
+- `next/font/google` au lieu de woff2 manuels (meilleure perf, auto-subset)
+- `--radius: 0.375rem` (6px) per spec
+- Charts colors aligned with brand palette (not oklch defaults)
+- Light theme `--secondary` changed to `#eef0f2` (bg-secondary token)
+- Dashboard layout split: server component (exports `dynamic`) + client `DashboardShell` (avoids prerender errors with Better Auth hooks)
+- Sonner toaster: removed `next-themes` dep, hardcoded light theme for now
+
+**mvp-03 — Auth Pages :**
+- Backend: `app.ts` + `server.ts` entry points (Express 5, helmet, cors, compression)
+- Backend: `config/auth.ts` — Better Auth with Prisma adapter + organization plugin
+- Better Auth mounted at `/api/auth/*splat` via `toNodeHandler()`
+- Frontend: `(auth)/layout.tsx` — centered, no nav, logo + accent dot
+- Frontend: `(auth)/login/page.tsx` — React Hook Form + Zod, Better Auth signIn, rate limit handling
+- Frontend: `(auth)/register/page.tsx` — name + email + password + confirm, Zod validation
+- Frontend: `(auth)/onboarding/organization/page.tsx` — org name + currency, auto-slug
+- i18n: auth.json updated with confirmPassword, emailTaken, rateLimited, organization section
+- Color fix: CTA `#d28370`, brand-logo `#2d5463`, secondary button `border-2` + tinted bg
+- Backend typecheck ✅, Frontend build ✅
+
+**Prochaine session :** Commencer mvp-04 (Onboarding Flow)
+
+### Session 3 — 2026-02-09
+
+**Objectif :** Implémenter mvp-04 (Onboarding Flow)
+
+**Réalisé :**
+- Backend: `modules/properties/` — schema.ts, service.ts (create + list), routes.ts (GET + POST)
+- Backend: `modules/ical/` — schema.ts, service.ts, routes.ts (POST with propertyId param)
+- Backend: auth middleware fallback — auto-finds first org if no activeOrganizationId
+- Backend: CORS fix for Better Auth — manual headers before `toNodeHandler()` (bypasses Express cors)
+- Frontend: `OnboardingStepper` component — 3-step horizontal stepper (terra active, green done)
+- Frontend: `/onboarding/property` — create property form (name, address, type, color picker)
+- Frontend: `/onboarding/ical` — connect iCal URL form + skip option
+- Frontend: `/onboarding/done` — confirmation page with property summary
+- Frontend: Register auto-creates org "default" + redirects to `/dashboard`
+- Frontend: Dashboard fetches real property count from API — shows onboarding CTA if 0
+- i18n: 40+ onboarding keys added to properties.json, dashboard empty state updated
+- Fix: double `/api/v1/` prefix in fetch URLs
+- Fix: `auth-client.ts` missing `'use client'` directive (useRef null error)
+- Fix: Suspense boundaries for pages using `useSearchParams()`
+- Removed dark mode: globals.css dark theme block + dark: prefixes from UI components
+- Backend typecheck ✅, Frontend build ✅
+
+**Décisions prises :**
+- Org auto-created on register (name: "default") — reduces friction, no separate org creation step
+- Onboarding accessible from dashboard empty state, not forced flow
+- Auth middleware fallback: finds first org if `activeOrganizationId` is null
+- Better Auth CORS: manual header injection before `toNodeHandler` (Express cors middleware headers get overwritten)
+
+**Prochaine session :** Commencer mvp-05 (Properties List & Detail)
+
 ---
 
 ## Contexte technique rapide
 
 ### Backend — Ce qui existe (`Hoxtup-api/src/`)
 ```
-src/config/   → index.ts, database.ts, cors.ts, plans.ts, bullmq.ts, redis.ts, logger.ts
-src/generated/ → Prisma client auto-généré
+src/config/          → index.ts, database.ts, cors.ts, plans.ts, bullmq.ts, redis.ts, logger.ts, auth.ts
+src/common/middleware → auth.ts (requireAuth + org fallback)
+src/modules/properties → schema.ts, service.ts, routes.ts (GET + POST)
+src/modules/ical      → schema.ts, service.ts, routes.ts (POST)
+src/app.ts            → Express app (helmet, cors, Better Auth CORS fix, routes)
+src/server.ts         → Entry point (listen on PORT)
+src/generated/        → Prisma client auto-généré
 ```
 
 ### Frontend — Ce qui existe (`Hoxtup-app/src/`)
 ```
-src/app/       → globals.css (light+dark Fusion Méd.), favicon.ico
-src/i18n/      → config.ts, I18nProvider.tsx, 11 namespaces FR
-src/lib/       → api-client.ts, auth-client.ts, currency.ts, utils.ts
-src/hooks/     → useAuth.ts, useCurrency.ts
-src/generated/ → api.d.ts (types OpenAPI)
+src/app/           → layout.tsx (next/font), page.tsx (preview), globals.css (tokens), favicon.ico
+src/app/dashboard/ → layout.tsx + 9 pages (dashboard, properties, reservations, tasks, calendar, team, settings, billing, incidents, more)
+src/app/(auth)/    → layout.tsx + login, register, onboarding/{organization,property,ical,done} pages
+src/components/    → auth-guard, bottom-nav-bar, sidebar, dashboard-header, dashboard-shell, providers
+src/components/ui/ → button, card, badge, dialog, sheet, skeleton, input, label, select, textarea, sonner
+src/i18n/          → config.ts, I18nProvider.tsx, 11 namespaces FR
+src/lib/           → api-client.ts, auth-client.ts, currency.ts, utils.ts
+src/hooks/         → useAuth.ts, useCurrency.ts, useNavItems.ts
+src/generated/     → api.d.ts (types OpenAPI)
 ```
 
-### Deps frontend à installer (mvp-01/02)
-- `@tanstack/react-query`, `zustand`, `framer-motion`
-- `react-hook-form`, `@hookform/resolvers`, `zod`
-- shadcn/ui primitives via `npx shadcn@latest add ...`
+### Deps frontend installées
+- `@tanstack/react-query`, `zustand`, `framer-motion` ✅
+- `react-hook-form`, `@hookform/resolvers`, `zod` ✅ (déjà dans package.json)
+- shadcn/ui : 11 composants installés ✅
 
 ### Patterns obligatoires
 - **Backend :** services reçoivent `db` tenant-scoped, jamais global `prisma`
@@ -102,7 +192,7 @@ src/generated/ → api.d.ts (types OpenAPI)
 
 | # | Problème | Impact | Quand résoudre |
 |:---|:---|:---|:---|
-| 1 | Fonts Inter+Outfit pas encore chargées (pas de `next/font`) | Pas de typo correcte | mvp-01 |
+| 1 | ~~Fonts Inter+Outfit pas encore chargées~~ | ✅ Résolu | mvp-01 |
 | 2 | Seed utilise `@node-rs/argon2` avec fallback | Hash potentiellement incompatible Better Auth | mvp-03 (re-seed via API) |
 | 3 | OpenAPI spec (51KB) a des TODO schemas | Validation responses cassée | Progressif par story |
 | 4 | `database.ts` forTenant() utilise $transaction par requête | Performance à surveiller | Post-MVP si problème |

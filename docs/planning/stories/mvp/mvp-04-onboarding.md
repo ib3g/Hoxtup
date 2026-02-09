@@ -1,6 +1,6 @@
 # mvp-04 — Onboarding Flow
 
-**Status :** `todo`
+**Status :** `done`
 **Scope :** Backend + Frontend
 **Dépendances :** mvp-03 (Auth Pages)
 
@@ -40,12 +40,12 @@ Flow guidé post-signup : créer la première propriété, connecter un calendri
 
 ## Acceptance Criteria
 
-- [ ] Le flow complet fonctionne : propriété → iCal → dashboard
-- [ ] Skip iCal fonctionne (va directement au dashboard)
-- [ ] La propriété apparaît ensuite dans la liste des propriétés
-- [ ] Si iCal connecté, les réservations sont visibles après sync
-- [ ] Tous les textes i18n
-- [ ] Mobile-first, formulaires confortables sur petit écran
+- [x] Le flow complet fonctionne : propriété → iCal → dashboard
+- [x] Skip iCal fonctionne (va directement au dashboard)
+- [x] La propriété apparaît ensuite dans la liste des propriétés
+- [ ] Si iCal connecté, les réservations sont visibles après sync (iCal sync job not yet implemented)
+- [x] Tous les textes i18n
+- [x] Mobile-first, formulaires confortables sur petit écran
 
 ## API utilisées
 

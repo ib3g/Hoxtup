@@ -1,6 +1,6 @@
 # mvp-01 — Design System & Tokens
 
-**Status :** `todo`
+**Status :** `done`
 **Scope :** Frontend only
 **Dépendances :** Aucune (première story)
 **Référence :** [frontend-guide.md](../../frontend-guide.md)

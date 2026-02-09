@@ -11,7 +11,7 @@
 | **Auth** | ✅ Conservé | Better Auth config prête (Session, Account, Member, Invitation models) |
 | **Infra** | ✅ Conservé + fixé | docker-compose (+ adminer ajouté), Dockerfiles, .env |
 | **Frontend** | 🟡 Nettoyé | Code obsolète supprimé. i18n/lib/hooks/globals.css conservés. Prêt pour mvp-01. |
-| **Design System** | 🔴 À faire | mvp-01 : Tailwind config, fonts Outfit+Inter, shadcn/ui setup |
+| **Design System** | ✅ Done | mvp-01 : Tailwind tokens, fonts next/font, 11 shadcn/ui components, Button 4 variants |
 | **Déploiement** | 🔴 À faire | Coolify (API) + Vercel (App) non configurés |
 
 ## Nettoyage effectué (post-audit)

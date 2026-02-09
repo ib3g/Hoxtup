@@ -1,6 +1,6 @@
 # mvp-02 — App Shell & Navigation
 
-**Status :** `todo`
+**Status :** `done`
 **Scope :** Frontend only
 **Dépendances :** mvp-01 (Design System)
 **Référence :** [frontend-guide.md](../../frontend-guide.md) — sections AppShell, BottomNavBar

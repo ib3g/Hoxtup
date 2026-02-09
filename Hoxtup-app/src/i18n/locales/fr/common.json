@@ -38,8 +38,25 @@
   },
   "nav": {
     "sidebar": "Navigation latérale",
-    "main": "Navigation principale"
+    "main": "Navigation principale",
+    "home": "Accueil",
+    "calendar": "Calendrier",
+    "team": "Équipe",
+    "more": "Plus",
+    "tasks": "Tâches",
+    "planning": "Planning",
+    "incident": "Incidents",
+    "properties": "Propriétés",
+    "reservations": "Réservations",
+    "inventory": "Inventaire",
+    "billing": "Facturation",
+    "settings": "Paramètres",
+    "dashboard": "Tableau de bord",
+    "collapse": "Réduire le menu",
+    "expand": "Agrandir le menu",
+    "inventoryV1": "V1"
   },
+  "skipToContent": "Aller au contenu principal",
   "pagination": {
     "previous": "Précédent",
     "next": "Suivant",

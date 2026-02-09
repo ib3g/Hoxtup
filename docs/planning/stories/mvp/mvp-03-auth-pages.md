@@ -1,6 +1,6 @@
 # mvp-03 — Auth Pages
 
-**Status :** `todo`
+**Status :** `done`
 **Scope :** Backend + Frontend
 **Dépendances :** mvp-01, mvp-02
 **Note :** Pages login et register existent déjà partiellement. Cette story les finalise avec le design system. Backend : setup Better Auth + endpoint org.

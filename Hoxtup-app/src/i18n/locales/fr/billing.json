@@ -1,13 +1,28 @@
 {
   "title": "Facturation",
+  "currentPlan": "Plan actuel",
+  "availablePlans": "Plans disponibles",
   "plan": {
     "free": "Gratuit",
     "starter": "Starter",
     "pro": "Pro",
-    "enterprise": "Entreprise"
+    "scale": "Scale",
+    "agency": "Agency"
   },
+  "perMonth": "/mois",
+  "custom": "Sur mesure",
+  "properties": "{{count}} propriétés",
+  "propertiesMax": "jusqu'à {{max}} propriétés",
   "subscription": "Abonnement",
   "invoices": "Factures",
-  "upgrade": "Mettre à niveau",
-  "cancel": "Annuler l'abonnement"
+  "upgrade": "Choisir ce plan",
+  "currentBadge": "Votre plan",
+  "recommended": "Recommandé",
+  "contactUs": "Contactez-nous",
+  "cancel": "Annuler l'abonnement",
+  "cancelConfirm": "Êtes-vous sûr de vouloir annuler ? Vous garderez l'accès jusqu'à la fin de la période.",
+  "cancelButton": "Confirmer l'annulation",
+  "cancelKeep": "Garder mon plan",
+  "renewalDate": "Renouvellement le {{date}}",
+  "freeBanner": "Passez à Starter pour ajouter plus de propriétés"
 }

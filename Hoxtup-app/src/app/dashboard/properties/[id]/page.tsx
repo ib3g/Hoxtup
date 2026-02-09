@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Pencil, Archive, RotateCcw, MapPin, Users, CalendarDays, FileText } from 'lucide-react'
+import { ArrowLeft, Pencil, Archive, RotateCcw, MapPin, Users, CalendarDays, FileText, Plus, Trash2, Link2, CheckCircle, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -247,11 +247,7 @@ export default function PropertyDetailPage() {
       )}
 
       {activeTab === 'ical' && (
-        <Card>
-          <CardContent className="p-5 text-center text-muted-foreground">
-            <p className="text-body">{t('ical.empty')}</p>
-          </CardContent>
-        </Card>
+        <ICalTab propertyId={property.id} />
       )}
 
       {activeTab === 'tasks' && (
@@ -287,6 +283,144 @@ export default function PropertyDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  )
+}
+
+const ICAL_API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
+
+interface ICalSource {
+  id: string
+  name: string
+  url: string
+  lastSyncAt: string | null
+  lastSyncStatus: string | null
+  errorMessage: string | null
+  createdAt: string
+}
+
+function ICalTab({ propertyId }: { propertyId: string }) {
+  const { t } = useTranslation('properties')
+  const [sources, setSources] = useState<ICalSource[]>([])
+  const [loading, setLoading] = useState(true)
+  const [adding, setAdding] = useState(false)
+  const [name, setName] = useState('')
+  const [url, setUrl] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
+  const fetchSources = useCallback(() => {
+    setLoading(true)
+    fetch(`${ICAL_API}/properties/${propertyId}/ical-sources`, { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data: ICalSource[]) => setSources(data))
+      .catch(() => setSources([]))
+      .finally(() => setLoading(false))
+  }, [propertyId])
+
+  useEffect(() => { fetchSources() }, [fetchSources])
+
+  async function handleAdd() {
+    setSubmitting(true)
+    try {
+      const res = await fetch(`${ICAL_API}/properties/${propertyId}/ical-sources`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ name, url }),
+      })
+      if (res.ok) {
+        setName('')
+        setUrl('')
+        setAdding(false)
+        fetchSources()
+      }
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  async function handleDelete(sourceId: string) {
+    await fetch(`${ICAL_API}/properties/${propertyId}/ical-sources/${sourceId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+    fetchSources()
+  }
+
+  if (loading) return <Skeleton className="h-32 rounded-lg" />
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-label">{t('ical.title')}</h3>
+        <Button size="sm" onClick={() => setAdding(!adding)}>
+          <Plus className="size-4 mr-1" />
+          {t('ical.add')}
+        </Button>
+      </div>
+
+      {adding && (
+        <Card>
+          <CardContent className="p-4 space-y-3">
+            <input
+              className="w-full border rounded-md px-3 py-2 text-sm"
+              placeholder={t('ical.sourceNamePlaceholder')}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <input
+              className="w-full border rounded-md px-3 py-2 text-sm"
+              placeholder={t('ical.urlPlaceholder')}
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+            />
+            <Button size="sm" onClick={handleAdd} disabled={submitting || !name || !url}>
+              {submitting ? t('ical.validating') : t('ical.add')}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {sources.length === 0 && !adding ? (
+        <Card>
+          <CardContent className="p-5 text-center text-muted-foreground">
+            <Link2 className="size-6 mx-auto mb-2 text-muted-foreground" />
+            <p className="text-body">{t('ical.empty')}</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-2">
+          {sources.map((src) => (
+            <Card key={src.id}>
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-label">{src.name}</span>
+                    {src.lastSyncStatus === 'success' ? (
+                      <CheckCircle className="size-3.5 text-success" />
+                    ) : src.lastSyncStatus === 'error' ? (
+                      <XCircle className="size-3.5 text-danger" />
+                    ) : null}
+                  </div>
+                  <p className="text-micro text-muted-foreground truncate">{src.url}</p>
+                  {src.lastSyncAt && (
+                    <p className="text-micro text-muted-foreground">
+                      {new Date(src.lastSyncAt).toLocaleString('fr-FR')}
+                    </p>
+                  )}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDelete(src.id)}
+                >
+                  <Trash2 className="size-4 text-muted-foreground" />
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -42,6 +42,70 @@
     "validating": "Validation...",
     "deleteConfirm": "Supprimer la source \"{{name}}\" ?"
   },
+  "list": {
+    "addProperty": "Ajouter une propriété",
+    "filterAll": "Toutes",
+    "filterActive": "Actives",
+    "filterArchived": "Archivées",
+    "noResults": "Aucune propriété trouvée",
+    "propertyCount": "{{count}} propriété(s)"
+  },
+  "detail": {
+    "tabs": {
+      "info": "Infos",
+      "reservations": "Réservations",
+      "ical": "iCal",
+      "tasks": "Tâches"
+    },
+    "info": {
+      "type": "Type de logement",
+      "address": "Adresse",
+      "capacity": "Capacité",
+      "notes": "Notes",
+      "createdAt": "Créée le",
+      "noNotes": "Aucune note"
+    },
+    "actions": {
+      "edit": "Modifier",
+      "archive": "Archiver",
+      "reactivate": "Réactiver",
+      "delete": "Supprimer"
+    },
+    "archiveDialog": {
+      "title": "Archiver cette propriété ?",
+      "description": "La propriété \"{{name}}\" sera archivée. Vous pourrez la réactiver plus tard.",
+      "confirm": "Archiver",
+      "cancel": "Annuler"
+    },
+    "notFound": "Propriété introuvable"
+  },
+  "form": {
+    "createTitle": "Nouvelle propriété",
+    "editTitle": "Modifier la propriété",
+    "name": "Nom",
+    "namePlaceholder": "ex: Appartement Marrakech",
+    "address": "Adresse",
+    "addressPlaceholder": "ex: 12 rue des Oliviers, 40000 Marrakech",
+    "type": "Type de logement",
+    "color": "Couleur",
+    "capacity": "Capacité (personnes)",
+    "notes": "Notes",
+    "notesPlaceholder": "Notes internes sur cette propriété...",
+    "submit": "Enregistrer",
+    "creating": "Création...",
+    "updating": "Mise à jour...",
+    "error": {
+      "nameRequired": "Nom requis",
+      "addressRequired": "Adresse requise",
+      "generic": "Erreur lors de l'enregistrement"
+    },
+    "success": {
+      "created": "Propriété créée",
+      "updated": "Propriété mise à jour",
+      "archived": "Propriété archivée",
+      "reactivated": "Propriété réactivée"
+    }
+  },
   "onboarding": {
     "step1": "Propriété",
     "step2": "Calendrier",

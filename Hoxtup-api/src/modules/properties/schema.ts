@@ -10,3 +10,14 @@ export const createPropertySchema = z.object({
 })
 
 export type CreatePropertyInput = z.infer<typeof createPropertySchema>
+
+export const updatePropertySchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  address: z.string().min(1).max(500).optional(),
+  type: z.enum(['APARTMENT', 'HOUSE', 'VILLA', 'STUDIO', 'ROOM', 'OTHER']).optional(),
+  colorIndex: z.number().int().min(0).max(4).optional(),
+  capacity: z.number().int().min(1).optional(),
+  notes: z.string().max(1000).optional(),
+})
+
+export type UpdatePropertyInput = z.infer<typeof updatePropertySchema>

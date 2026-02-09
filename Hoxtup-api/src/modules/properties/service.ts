@@ -1,5 +1,5 @@
 import type { PrismaClient } from '../../generated/prisma/client.js'
-import type { CreatePropertyInput } from './schema.js'
+import type { CreatePropertyInput, UpdatePropertyInput } from './schema.js'
 import { logger } from '../../config/logger.js'
 
 export async function listProperties(db: PrismaClient, organizationId: string) {
@@ -29,4 +29,49 @@ export async function createProperty(
   })
 
   return property
+}
+
+export async function getProperty(db: PrismaClient, organizationId: string, id: string) {
+  return db.property.findFirst({
+    where: { id, organizationId },
+  })
+}
+
+export async function updateProperty(
+  db: PrismaClient,
+  organizationId: string,
+  id: string,
+  input: UpdatePropertyInput,
+) {
+  logger.info({ organizationId, id }, 'Updating property')
+
+  return db.property.update({
+    where: { id, organizationId },
+    data: {
+      ...(input.name !== undefined && { name: input.name }),
+      ...(input.address !== undefined && { address: input.address }),
+      ...(input.type !== undefined && { type: input.type as 'APARTMENT' | 'HOUSE' | 'VILLA' | 'STUDIO' | 'ROOM' | 'OTHER' }),
+      ...(input.colorIndex !== undefined && { colorIndex: input.colorIndex }),
+      ...(input.capacity !== undefined && { capacity: input.capacity }),
+      ...(input.notes !== undefined && { notes: input.notes }),
+    },
+  })
+}
+
+export async function archiveProperty(db: PrismaClient, organizationId: string, id: string) {
+  logger.info({ organizationId, id }, 'Archiving property')
+
+  return db.property.update({
+    where: { id, organizationId },
+    data: { archivedAt: new Date() },
+  })
+}
+
+export async function reactivateProperty(db: PrismaClient, organizationId: string, id: string) {
+  logger.info({ organizationId, id }, 'Reactivating property')
+
+  return db.property.update({
+    where: { id, organizationId },
+    data: { archivedAt: null },
+  })
 }

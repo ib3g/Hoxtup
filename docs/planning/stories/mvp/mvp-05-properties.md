@@ -1,6 +1,6 @@
 # mvp-05 — Properties List & Detail
 
-**Status :** `todo`
+**Status :** `done`
 **Scope :** Backend + Frontend
 **Dépendances :** mvp-02 (App Shell)
 
@@ -43,15 +43,15 @@ CRUD complet des propriétés : liste, détail, création, modification, archiva
 
 ## Acceptance Criteria
 
-- [ ] Liste affiche toutes les propriétés actives
-- [ ] Création fonctionne et la nouvelle propriété apparaît dans la liste
-- [ ] Modification met à jour les infos
-- [ ] Archivage → propriété disparaît de la liste (visible avec toggle)
-- [ ] Réactivation fonctionne
-- [ ] PropertyColorDot est cohérent partout
-- [ ] Subscription guard : si limite propriétés atteinte → message + CTA upgrade
-- [ ] Tous les textes i18n
-- [ ] Responsive mobile/desktop
+- [x] Liste affiche toutes les propriétés actives
+- [x] Création fonctionne et la nouvelle propriété apparaît dans la liste
+- [x] Modification met à jour les infos
+- [x] Archivage → propriété disparaît de la liste (visible avec toggle)
+- [x] Réactivation fonctionne
+- [x] PropertyColorDot est cohérent partout
+- [ ] Subscription guard : si limite propriétés atteinte → message + CTA upgrade (post-MVP billing)
+- [x] Tous les textes i18n
+- [x] Responsive mobile/desktop
 
 ## API utilisées
 

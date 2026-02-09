@@ -10,8 +10,8 @@
 | Métrique | Valeur |
 |:---|:---|
 | **Phase actuelle** | Phase 1 — MVP |
-| **Story en cours** | mvp-05 (Properties List & Detail) |
-| **Stories terminées** | 4 / 17 |
+| **Story en cours** | mvp-06 (Reservations List) |
+| **Stories terminées** | 5 / 17 |
 | **Dernière mise à jour** | 2026-02-09 |
 
 ---
@@ -24,7 +24,7 @@
 | mvp-02 | App Shell & Navigation | Frontend | ✅ Done | Session 2 |
 | mvp-03 | Auth Pages | Backend + Frontend | ✅ Done | Session 2 |
 | mvp-04 | Onboarding Flow | Backend + Frontend | ✅ Done | Session 3 |
-| mvp-05 | Properties List & Detail | Backend + Frontend | ⬜ Todo | Dépend de mvp-02 |
+| mvp-05 | Properties List & Detail | Backend + Frontend | ✅ Done | Session 3 |
 | mvp-06 | Reservations List | Backend + Frontend | ⬜ Todo | Dépend de mvp-05 |
 | mvp-07 | iCal Management | Backend + Frontend | ⬜ Todo | Dépend de mvp-05 |
 | mvp-08 | Task List & Filtering | Backend + Frontend | ⬜ Todo | Dépend de mvp-05 |

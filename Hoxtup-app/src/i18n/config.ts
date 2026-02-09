@@ -13,6 +13,7 @@ import billingFr from './locales/fr/billing.json'
 import notificationsFr from './locales/fr/notifications.json'
 import settingsFr from './locales/fr/settings.json'
 import reservationsFr from './locales/fr/reservations.json'
+import teamFr from './locales/fr/team.json'
 
 const resources = {
   fr: {
@@ -27,6 +28,7 @@ const resources = {
     notifications: notificationsFr,
     settings: settingsFr,
     reservations: reservationsFr,
+    team: teamFr,
   },
 }
 
@@ -49,6 +51,7 @@ i18n
       'notifications',
       'settings',
       'reservations',
+      'team',
     ],
     interpolation: { escapeValue: false },
     detection: {

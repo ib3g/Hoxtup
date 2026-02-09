@@ -1,0 +1,26 @@
+{
+  "title": "Équipe",
+  "invite": "Inviter un membre",
+  "empty": {
+    "title": "Aucun membre",
+    "description": "Invitez des membres pour commencer à collaborer."
+  },
+  "roles": {
+    "owner": "Propriétaire",
+    "admin": "Administrateur",
+    "manager": "Manager",
+    "member": "Membre",
+    "staff_autonomous": "Staff autonome",
+    "staff_managed": "Staff géré"
+  },
+  "actions": {
+    "changeRole": "Changer le rôle",
+    "remove": "Retirer",
+    "removeConfirm": "Êtes-vous sûr de vouloir retirer ce membre ?",
+    "cancel": "Annuler",
+    "confirm": "Confirmer"
+  },
+  "roleChanged": "Rôle mis à jour",
+  "memberRemoved": "Membre retiré",
+  "selectRole": "Sélectionner un rôle"
+}

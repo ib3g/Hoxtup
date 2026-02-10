@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import DevQuickLogin from './DevQuickLogin'
 
 export default function LoginPage() {
   const { t } = useTranslation('auth')
@@ -53,6 +54,7 @@ export default function LoginPage() {
   }
 
   return (
+    <>
     <Card>
       <CardHeader className="text-center space-y-1">
         <h1 className="text-heading">{t('login.title')}</h1>
@@ -110,5 +112,8 @@ export default function LoginPage() {
         </p>
       </CardFooter>
     </Card>
+
+    <DevQuickLogin />
+  </>
   )
 }

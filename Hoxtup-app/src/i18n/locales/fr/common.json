@@ -57,6 +57,10 @@
     "expand": "Agrandir le menu",
     "inventoryV1": "V1"
   },
+  "org": {
+    "switch": "Changer d'organisation",
+    "default": "Organisation"
+  },
   "skipToContent": "Aller au contenu principal",
   "pagination": {
     "previous": "Précédent",

@@ -9,7 +9,7 @@ export function useAuth() {
   return {
     user: session.data?.user ?? null,
     isAuthenticated: !!session.data,
-    isLoading: session.isPending,
+    isLoading: session.isPending || activeOrg.isPending,
     activeOrg: activeOrg.data,
     signOut: () => authClient.signOut(),
   }

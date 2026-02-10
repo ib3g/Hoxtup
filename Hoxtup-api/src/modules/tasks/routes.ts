@@ -89,7 +89,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 
   try {
-    const task = await createTask(prisma, authReq.organizationId, parsed.data)
+    const task = await createTask(prisma, authReq.organizationId, parsed.data, authReq.user.id)
     res.status(201).json(task)
   } catch (err) {
     logger.error({ err, organizationId: authReq.organizationId }, 'Failed to create task')
@@ -119,7 +119,7 @@ router.patch('/:id', requireAuth, async (req, res) => {
   }
 
   try {
-    const task = await updateTask(prisma, authReq.organizationId, id, parsed.data)
+    const task = await updateTask(prisma, authReq.organizationId, id, parsed.data, authReq.user.id)
     res.json(task)
   } catch (err) {
     logger.error({ err, id }, 'Failed to update task')

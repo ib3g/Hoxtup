@@ -102,5 +102,8 @@
   "deleteDescription": "La tâche \"{{title}}\" sera supprimée définitivement.",
   "deleteCancel": "Annuler",
   "deleteSuccess": "Tâche supprimée",
-  "updating": "Mise à jour..."
+  "updating": "Mise à jour...",
+  "history": {
+    "title": "Historique"
+  }
 }

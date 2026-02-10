@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CalendarDays, FileText, Clock, AlertTriangle, Pencil, Trash2 } from 'lucide-react'
+import { CalendarDays, FileText, Clock, AlertTriangle, Pencil, Trash2, History } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -23,11 +23,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1
 interface Property { id: string; name: string; colorIndex: number }
 interface AssignedUser { id: string; name: string }
 interface Reservation { id: string; guestName: string; checkIn: string; checkOut: string }
+interface HistoryEntry {
+  id: string; fromStatus: string; toStatus: string; actorId: string
+  note: string | null; createdAt: string
+}
 interface Task {
   id: string; title: string; description: string | null; type: string; status: string
   scheduledAt: string | null; startedAt: string | null; completedAt: string | null
   note: string | null; property: Property; assignedUser: AssignedUser | null
-  reservation: Reservation | null; createdAt: string
+  reservation: Reservation | null; createdAt: string; history?: HistoryEntry[]
 }
 interface Member { id: string; userId: string; role: string; user: { id: string; name: string; email: string } }
 
@@ -341,7 +345,9 @@ export function TaskDetailSheet({ taskId, open, onOpenChange, onTaskUpdated }: T
                     <Clock className="size-3.5 mt-0.5 text-muted-foreground shrink-0" />
                     <div>
                       <p className="text-micro text-muted-foreground">{t('actions.start')}</p>
-                      <p className="text-caption">{new Date(task.startedAt).toLocaleString('fr-FR')}</p>
+                      <p className="text-caption">{new Date(task.startedAt).toLocaleString('fr-FR', {
+                          day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
+                        })}</p>
                     </div>
                   </div>
                 )}
@@ -361,7 +367,9 @@ export function TaskDetailSheet({ taskId, open, onOpenChange, onTaskUpdated }: T
                     <Clock className="size-3.5 mt-0.5 text-success shrink-0" />
                     <div>
                       <p className="text-micro text-muted-foreground">{t('actions.complete')}</p>
-                      <p className="text-caption">{new Date(task.completedAt).toLocaleString('fr-FR')}</p>
+                      <p className="text-caption">{new Date(task.completedAt).toLocaleString('fr-FR', {
+                          day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
+                        })}</p>
                     </div>
                   </div>
                 )}
@@ -388,6 +396,46 @@ export function TaskDetailSheet({ taskId, open, onOpenChange, onTaskUpdated }: T
                   </div>
                 )}
               </div>
+
+              {task.history && task.history.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <History className="size-3.5 text-muted-foreground" />
+                    <p className="text-micro text-muted-foreground font-medium">{t('history.title')}</p>
+                  </div>
+                  <div className="relative pl-4 border-l-2 border-muted space-y-3">
+                    {task.history.map((h) => {
+                      const actorMember = members.find((m) => m.user.id === h.actorId)
+                      const actorName = actorMember?.user.name ?? '?'
+                      const isStatusChange = h.fromStatus !== h.toStatus
+                      return (
+                        <div key={h.id} className="relative">
+                          <div className="absolute -left-[calc(0.5rem+5px)] top-1 size-2 rounded-full bg-muted-foreground" />
+                          <div className="space-y-0.5">
+                            {isStatusChange && (
+                              <div className={`flex items-center gap-1.5 flex-wrap`}>
+                                <span className={`text-micro ${TASK_STATUS_COLORS[h.fromStatus]} bg-transparent p-0`}>  
+                                  {t(`status.${taskStatusKey(h.fromStatus)}`)}
+                                </span>
+                                <span className="text-micro text-muted-foreground">→</span>
+                                <span className={`text-micro ${TASK_STATUS_COLORS[h.toStatus]} bg-transparent p-0`}>  
+                                  {t(`status.${taskStatusKey(h.toStatus)}`)}
+                                </span>
+                              </div>
+                            )}
+                            {h.note && (
+                              <p className="text-micro">{h.note}</p>
+                            )}
+                            <p className="text-micro text-muted-foreground">
+                              {actorName} — {new Date(h.createdAt).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </SheetContent>

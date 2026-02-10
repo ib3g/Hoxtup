@@ -12,7 +12,7 @@
 | **Infra** | ✅ Conservé + fixé | docker-compose (+ adminer ajouté), Dockerfiles, .env |
 | **Frontend** | ✅ Avancé | 12 pages dashboard + 6 pages auth/onboarding. 15 composants custom + 13 UI. 12 namespaces i18n. |
 | **Design System** | ✅ Done | mvp-01 : Tailwind tokens, fonts next/font, 13 shadcn/ui components, Button 4 variants |
-| **MVP Progress** | 🟡 82% | 14/17 stories done, 3 partielles (mvp-13, 16, 17) |
+| **MVP Progress** | ✅ 100% | 17/17 stories done |
 | **Déploiement** | 🔴 À faire | Coolify (API) + Vercel (App) non configurés |
 
 ## Nettoyage effectué (post-audit)
@@ -99,11 +99,13 @@ Le schema (695 lignes) couvre tous les modèles nécessaires :
 - **Billing :** Subscription (5 tiers)
 - **Audit :** TeamAuditLog, ReservationTaskAudit, PropertyAssignment
 
-## Prochaines étapes — Compléter les 4 stories partielles
+## Prochaines étapes — Phase 2 (V1)
 
-1. **mvp-13** — Team Management : ajouter les endpoints backend d'invitation (POST /team/invite) + gestion des invitations
-2. **mvp-16** — Settings & Profile : ajouter les endpoints backend pour user preferences (language, timezone) et password change
-3. **mvp-17** — Billing & Subscription : intégrer Polar SDK pour upgrade/downgrade + webhook handling
+Phase 1 MVP terminée (17/17 stories). Prochaines priorités :
+
+1. **Déploiement** — Configurer Coolify (API) + Vercel (App), variables d'environnement production
+2. **Polar production** — Configurer les variables `POLAR_ACCESS_TOKEN`, `POLAR_WEBHOOK_SECRET`, product IDs
+3. **Phase 2 v1-01** — Stock Management (premier story V1)
 
 ## Deferred items (à implémenter en V1/V1.1)
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslation } from 'react-i18next'
+import { OrgSwitcher } from '@/components/org-switcher'
 
 interface DashboardHeaderProps {
   userName: string
@@ -28,6 +29,9 @@ export function DashboardHeader({ userName }: DashboardHeaderProps) {
 
   return (
     <header className="space-y-1 px-4 py-4 md:px-6 md:py-6">
+      <div className="flex items-center justify-between lg:hidden mb-2">
+        <OrgSwitcher variant="header" />
+      </div>
       <h1 className="text-display text-foreground">
         {t(greetingKey, { name: userName })}
       </h1>

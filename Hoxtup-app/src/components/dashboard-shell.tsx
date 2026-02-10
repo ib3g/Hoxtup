@@ -33,7 +33,7 @@ function DashboardShellInner({ children }: { children: React.ReactNode }) {
       <Sidebar items={sidebarNav} />
 
       <div className="flex flex-1 flex-col min-w-0 overflow-y-auto">
-        <div className="sticky top-0 z-10 bg-white">
+        <div className="sticky top-0 z-10 bg-white mb-4">
           {isDashboardHome ? <DashboardHeader userName={userName} /> : <PageHeader />}
         </div>
 

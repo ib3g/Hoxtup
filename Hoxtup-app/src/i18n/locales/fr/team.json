@@ -20,6 +20,23 @@
     "cancel": "Annuler",
     "confirm": "Confirmer"
   },
+  "inviteForm": {
+    "email": "Adresse email",
+    "role": "Rôle",
+    "submit": "Envoyer l'invitation",
+    "sending": "Envoi...",
+    "success": "Invitation envoyée",
+    "error": "Échec de l'envoi de l'invitation",
+    "cancelled": "Invitation annulée",
+    "resend": "Relancer l'invitation",
+    "resent": "Invitation relancée"
+  },
+  "status": {
+    "active": "Actif",
+    "invited": "Invité",
+    "expired": "Expirée"
+  },
+  "you": "vous",
   "roleChanged": "Rôle mis à jour",
   "memberRemoved": "Membre retiré",
   "selectRole": "Sélectionner un rôle"

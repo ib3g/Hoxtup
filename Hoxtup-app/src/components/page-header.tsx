@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { OrgSwitcher } from '@/components/org-switcher'
 
 const ROUTE_TITLES: Record<string, string> = {
   '/dashboard': 'nav.dashboard',
@@ -72,6 +73,9 @@ export function PageHeader() {
 
   return (
     <header className="px-4 pt-4 pb-2 md:px-6 md:pt-6 space-y-1">
+      <div className="flex items-center justify-between lg:hidden mb-1">
+        <OrgSwitcher variant="header" />
+      </div>
       <div className="flex items-center gap-1 text-micro text-muted-foreground">
         <Button
           variant="ghost"

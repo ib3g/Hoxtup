@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod/v4'
@@ -14,9 +14,11 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import DevQuickLogin from './DevQuickLogin'
 
-export default function LoginPage() {
+function LoginContent() {
   const { t } = useTranslation('auth')
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect')
   const [serverError, setServerError] = useState<string | null>(null)
 
   const schema = z.object({
@@ -50,7 +52,7 @@ export default function LoginPage() {
       return
     }
 
-    router.push('/dashboard')
+    router.push(redirectTo || '/dashboard')
   }
 
   return (
@@ -115,5 +117,13 @@ export default function LoginPage() {
 
     <DevQuickLogin />
   </>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
   )
 }

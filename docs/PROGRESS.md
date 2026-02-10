@@ -10,9 +10,9 @@
 | Métrique | Valeur |
 |:---|:---|
 | **Phase actuelle** | Phase 1 — MVP |
-| **Story en cours** | mvp-13, mvp-16, mvp-17 (partielles) |
-| **Stories terminées** | 14 / 17 |
-| **Stories partielles** | 3 / 17 (mvp-13, mvp-16, mvp-17) |
+| **Story en cours** | Phase 1 MVP terminée |
+| **Stories terminées** | 17 / 17 |
+| **Stories partielles** | 0 / 17 |
 | **Dernière mise à jour** | 2026-02-10 |
 
 ---
@@ -33,11 +33,11 @@
 | mvp-10 | Task Assignment | Backend + Frontend | ✅ Done | Sessions 4-7 |
 | mvp-11 | Manual Task Creation | Backend + Frontend | ✅ Done | Sessions 4-7 |
 | mvp-12 | Calendar View | Backend + Frontend | ✅ Done | Sessions 4-7 |
-| mvp-13 | Team Management | Backend + Frontend | 🔵 Partiel | Frontend done, backend manque invitations |
+| mvp-13 | Team Management | Backend + Frontend | ✅ Done | Invitations via Better Auth API (email + rôle), cancel, pending list |
 | mvp-14 | Notifications | Backend + Frontend | ✅ Done | Sessions 4-7 |
 | mvp-15 | Dashboard Home | Backend + Frontend | ✅ Done | Sessions 4-7 |
-| mvp-16 | Settings & Profile | Backend + Frontend | 🔵 Partiel | Frontend done, backend manque API settings |
-| mvp-17 | Billing & Subscription | Backend + Frontend | 🔵 Partiel | Frontend done, backend plans only — manque upgrade/Polar |
+| mvp-16 | Settings & Profile | Backend + Frontend | ✅ Done | Section Organisation ajoutée (nom + currency), PATCH /team/organization |
+| mvp-17 | Billing & Subscription | Backend + Frontend | ✅ Done | Polar SDK intégré, checkout/cancel/webhook, subscription guard |
 
 **Légende :** ⬜ Todo · 🔵 En cours · ✅ Done · 🔴 Bloqué
 
@@ -172,10 +172,18 @@
 - `feat(mvp-17)` : billing & subscription — plans display, current plan, upgrade CTAs
 - `feat(mvp-18)` : latest changes — task details, reservations, UI improvements
 
-**Ce qui reste (stories partielles) :**
-- mvp-13 : Backend invitation endpoints (frontend done)
-- mvp-16 : Backend settings API endpoints (frontend done)
-- mvp-17 : Backend upgrade/downgrade + Polar webhook integration
+**Phase 1 MVP : 17/17 stories done.**
+
+### Session 8 — 2026-02-10
+
+**Objectif :** Compléter les 3 stories MVP partielles (mvp-13, mvp-16, mvp-17)
+
+**Réalisé :**
+- mvp-13 : InviteMemberSheet component, Better Auth `inviteMember()` API, pending invitations list, cancel invitation
+- mvp-16 : Section Organisation dans Settings (nom + currency EUR/MAD), endpoint `PATCH /team/organization`
+- mvp-17 : Config Polar SDK (conditionnel), service billing complet (checkout, cancel, webhook), routes refactorisées, frontend wired (upgrade redirect, cancel dialog, post-checkout polling), subscription guard sur property creation
+- i18n : team.json + billing.json mis à jour
+- Backend typecheck ✅, Frontend build ✅
 
 ---
 

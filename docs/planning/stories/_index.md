@@ -19,11 +19,11 @@
 | mvp-10 | Task Assignment | Backend + Frontend | `done` | [mvp/mvp-10-task-assignment.md](./mvp/mvp-10-task-assignment.md) |
 | mvp-11 | Manual Task Creation | Backend + Frontend | `done` | [mvp/mvp-11-task-create.md](./mvp/mvp-11-task-create.md) |
 | mvp-12 | Calendar View | Backend + Frontend | `done` | [mvp/mvp-12-calendar.md](./mvp/mvp-12-calendar.md) |
-| mvp-13 | Team Management | Backend + Frontend | `in-progress` | [mvp/mvp-13-team.md](./mvp/mvp-13-team.md) |
+| mvp-13 | Team Management | Backend + Frontend | `done` | [mvp/mvp-13-team.md](./mvp/mvp-13-team.md) |
 | mvp-14 | Notifications | Backend + Frontend | `done` | [mvp/mvp-14-notifications.md](./mvp/mvp-14-notifications.md) |
 | mvp-15 | Dashboard Home | Backend + Frontend | `done` | [mvp/mvp-15-dashboard.md](./mvp/mvp-15-dashboard.md) |
-| mvp-16 | Settings & Profile | Backend + Frontend | `in-progress` | [mvp/mvp-16-settings.md](./mvp/mvp-16-settings.md) |
-| mvp-17 | Billing & Subscription | Backend + Frontend | `in-progress` | [mvp/mvp-17-billing.md](./mvp/mvp-17-billing.md) |
+| mvp-16 | Settings & Profile | Backend + Frontend | `done` | [mvp/mvp-16-settings.md](./mvp/mvp-16-settings.md) |
+| mvp-17 | Billing & Subscription | Backend + Frontend | `done` | [mvp/mvp-17-billing.md](./mvp/mvp-17-billing.md) |
 
 ## Phase 2 — V1 (12 stories fullstack)
 

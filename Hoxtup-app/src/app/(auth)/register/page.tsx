@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod/v4'
@@ -13,9 +13,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 
-export default function RegisterPage() {
+function RegisterContent() {
   const { t } = useTranslation('auth')
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect')
   const [serverError, setServerError] = useState<string | null>(null)
 
   const schema = z
@@ -63,17 +65,20 @@ export default function RegisterPage() {
       return
     }
 
-    const orgResult = await authClient.organization.create({
-      name: 'default',
-      slug: `org-${crypto.randomUUID().slice(0, 8)}`,
-      metadata: { currencyCode: 'MAD' },
-    })
+    // Skip org creation if registering via invitation — they'll join the existing org
+    if (!redirectTo?.includes('/invite/accept')) {
+      const orgResult = await authClient.organization.create({
+        name: 'default',
+        slug: `org-${crypto.randomUUID().slice(0, 8)}`,
+        metadata: { currencyCode: 'MAD' },
+      })
 
-    if (orgResult.data) {
-      await authClient.organization.setActive({ organizationId: orgResult.data.id })
+      if (orgResult.data) {
+        await authClient.organization.setActive({ organizationId: orgResult.data.id })
+      }
     }
 
-    router.push('/dashboard')
+    router.push(redirectTo || '/dashboard')
   }
 
   return (
@@ -177,5 +182,13 @@ export default function RegisterPage() {
         </p>
       </CardFooter>
     </Card>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterContent />
+    </Suspense>
   )
 }

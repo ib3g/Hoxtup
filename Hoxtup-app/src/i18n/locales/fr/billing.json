@@ -24,5 +24,12 @@
   "cancelButton": "Confirmer l'annulation",
   "cancelKeep": "Garder mon plan",
   "renewalDate": "Renouvellement le {{date}}",
-  "freeBanner": "Passez à Starter pour ajouter plus de propriétés"
+  "freeBanner": "Passez à Starter pour ajouter plus de propriétés",
+  "redirecting": "Redirection...",
+  "notConfigured": "La facturation n'est pas encore configurée",
+  "checkoutError": "Erreur lors de la création du paiement",
+  "checkoutProcessing": "Paiement en cours de traitement...",
+  "planUpdated": "Plan mis à jour avec succès",
+  "cancelSuccess": "Abonnement annulé",
+  "cancelError": "Erreur lors de l'annulation"
 }

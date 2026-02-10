@@ -11,6 +11,15 @@ const envSchema = z.object({
   LOG_LEVEL: z
     .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace'])
     .default('info'),
+  SMTP_HOST: z.string().default('localhost'),
+  SMTP_PORT: z.coerce.number().default(1025),
+  SMTP_USER: z.string().default(''),
+  SMTP_PASS: z.string().default(''),
+  SMTP_FROM: z.string().default('Hoxtup <noreply@hoxtup.local>'),
+  POLAR_ACCESS_TOKEN: z.string().default(''),
+  POLAR_SANDBOX: z.coerce.boolean().default(true),
+  POLAR_WEBHOOK_SECRET: z.string().default(''),
+  POLAR_SUCCESS_URL: z.string().default('http://localhost:3000/dashboard/billing?checkout=success'),
 })
 
 export const config = envSchema.parse(process.env)

@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import { OrgSwitcher } from '@/components/org-switcher'
 import type { NavItem } from '@/hooks/useNavItems'
 
 interface SidebarProps {
@@ -33,6 +34,10 @@ export function Sidebar({ items }: SidebarProps) {
         {!collapsed && (
           <span className="inline-block h-2 w-2 rounded-full bg-brand-accent" />
         )}
+      </div>
+
+      <div className="border-b border-white/10 px-2 py-2">
+        <OrgSwitcher collapsed={collapsed} variant="sidebar" />
       </div>
 
       <nav className="flex-1 overflow-y-auto py-2">

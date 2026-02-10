@@ -1,12 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { CreditCard, Check, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
@@ -23,29 +26,109 @@ interface Plan {
 
 interface BillingInfo {
   currentPlan: string
+  planTier: string
+  status: string
   propertyCount: number
+  maxProperties: number
   renewalDate: string | null
+  cancelledAt: string | null
 }
 
 export default function BillingPage() {
   const { t } = useTranslation('billing')
+  const searchParams = useSearchParams()
   const [plans, setPlans] = useState<Plan[]>([])
   const [billing, setBilling] = useState<BillingInfo | null>(null)
   const [loading, setLoading] = useState(true)
+  const [upgrading, setUpgrading] = useState<string | null>(null)
+  const [cancelOpen, setCancelOpen] = useState(false)
+  const [cancelling, setCancelling] = useState(false)
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  useEffect(() => {
-    setLoading(true)
-    Promise.all([
+  const fetchBilling = useCallback(() => {
+    return Promise.all([
       fetch(`${API_URL}/billing/plans`, { credentials: 'include' }).then((r) => r.ok ? r.json() : []),
       fetch(`${API_URL}/billing`, { credentials: 'include' }).then((r) => r.ok ? r.json() : null),
     ])
       .then(([plansData, billingData]: [Plan[], BillingInfo | null]) => {
         setPlans(plansData)
         setBilling(billingData)
+        return billingData
       })
-      .catch(() => { setPlans([]); setBilling(null) })
-      .finally(() => setLoading(false))
+      .catch(() => { setPlans([]); setBilling(null); return null })
   }, [])
+
+  useEffect(() => {
+    setLoading(true)
+    fetchBilling().finally(() => setLoading(false))
+  }, [fetchBilling])
+
+  // Poll after checkout redirect
+  useEffect(() => {
+    if (searchParams.get('checkout') !== 'success') return
+
+    let attempts = 0
+    const initialPlan = billing?.currentPlan
+
+    pollRef.current = setInterval(async () => {
+      attempts++
+      const data = await fetchBilling()
+      if (data && data.currentPlan !== initialPlan) {
+        toast.success(t('planUpdated'))
+        if (pollRef.current) clearInterval(pollRef.current)
+      }
+      if (attempts >= 10 && pollRef.current) {
+        clearInterval(pollRef.current)
+      }
+    }, 3000)
+
+    return () => { if (pollRef.current) clearInterval(pollRef.current) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
+
+  async function handleUpgrade(planId: string) {
+    const tier = planId.toUpperCase()
+    setUpgrading(planId)
+    try {
+      const res = await fetch(`${API_URL}/billing/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ planTier: tier }),
+      })
+      if (res.ok) {
+        const { checkoutUrl } = await res.json()
+        window.location.href = checkoutUrl
+      } else if (res.status === 503) {
+        toast.error(t('notConfigured'))
+      } else {
+        toast.error(t('checkoutError'))
+      }
+    } catch {
+      toast.error(t('checkoutError'))
+    } finally {
+      setUpgrading(null)
+    }
+  }
+
+  async function handleCancel() {
+    setCancelling(true)
+    try {
+      const res = await fetch(`${API_URL}/billing/cancel`, {
+        method: 'POST',
+        credentials: 'include',
+      })
+      if (res.ok) {
+        toast.success(t('cancelSuccess'))
+        setCancelOpen(false)
+        fetchBilling()
+      }
+    } catch {
+      toast.error(t('cancelError'))
+    } finally {
+      setCancelling(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -60,6 +143,8 @@ export default function BillingPage() {
   }
 
   const currentPlanId = billing?.currentPlan ?? 'free'
+  const isPaid = currentPlanId !== 'free'
+  const isCancelled = !!billing?.cancelledAt
 
   return (
     <div className="space-y-6">
@@ -90,6 +175,21 @@ export default function BillingPage() {
                 {t('freeBanner')}
               </div>
             )}
+            {isPaid && !isCancelled && (
+              <div className="mt-3 pt-3 border-t flex justify-end">
+                <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setCancelOpen(true)}>
+                  {t('cancel')}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {searchParams.get('checkout') === 'success' && (
+        <Card className="border-success">
+          <CardContent className="p-4 text-center text-success text-caption">
+            {t('checkoutProcessing')}
           </CardContent>
         </Card>
       )}
@@ -101,6 +201,8 @@ export default function BillingPage() {
           const isCurrent = plan.id === currentPlanId
           const isRecommended = plan.id === 'starter'
           const isAgency = plan.id === 'agency'
+          const isFree = plan.id === 'free'
+          const isUpgrading = upgrading === plan.id
 
           return (
             <Card
@@ -156,10 +258,14 @@ export default function BillingPage() {
                   <Button variant="secondary" className="w-full" disabled>
                     {t('contactUs')}
                   </Button>
+                ) : isFree ? (
+                  <Button variant="secondary" className="w-full" disabled>
+                    {plan.name}
+                  </Button>
                 ) : (
-                  <Button className="w-full">
-                    {t('upgrade')}
-                    <ArrowRight className="size-4 ml-1" />
+                  <Button className="w-full" onClick={() => handleUpgrade(plan.id)} disabled={isUpgrading}>
+                    {isUpgrading ? t('redirecting') : t('upgrade')}
+                    {!isUpgrading && <ArrowRight className="size-4 ml-1" />}
                   </Button>
                 )}
               </CardContent>
@@ -167,6 +273,23 @@ export default function BillingPage() {
           )
         })}
       </div>
+
+      <Dialog open={cancelOpen} onOpenChange={setCancelOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('cancel')}</DialogTitle>
+            <DialogDescription>{t('cancelConfirm')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setCancelOpen(false)}>
+              {t('cancelKeep')}
+            </Button>
+            <Button variant="destructive" onClick={handleCancel} disabled={cancelling}>
+              {t('cancelButton')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

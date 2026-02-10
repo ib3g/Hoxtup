@@ -136,13 +136,12 @@ router.post('/cancel', requireAuth, requireRole('owner', 'admin'), async (req, r
 router.post('/webhook', async (req, res) => {
   const signature = req.headers['x-polar-signature'] as string | undefined
 
-  if (config.POLAR_WEBHOOK_SECRET && signature) {
-    // TODO: Verify webhook signature with Polar SDK when available
-    // For now, accept all webhooks in development
-    if (config.NODE_ENV === 'production' && !signature) {
+  if (config.POLAR_WEBHOOK_SECRET) {
+    if (!signature) {
       res.status(401).json({ error: 'Missing signature' })
       return
     }
+    // TODO: Verify webhook signature with Polar SDK when available
   }
 
   try {

@@ -37,7 +37,7 @@ const ROLES = ['owner', 'admin', 'manager', 'member', 'staff_autonomous', 'staff
 export default function TeamPage() {
   const { t } = useTranslation('team')
   const { user, activeOrg } = useAuth()
-  const myRole = activeOrg?.members?.[0]?.role ?? 'member'
+  const myRole = activeOrg?.members?.find((m: { userId: string }) => m.userId === user?.id)?.role ?? 'member'
   const canManage = ['owner', 'admin'].includes(myRole)
   const [members, setMembers] = useState<Member[]>([])
   const [invitations, setInvitations] = useState<Invitation[]>([])

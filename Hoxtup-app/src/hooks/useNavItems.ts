@@ -52,6 +52,7 @@ const SIDEBAR_ITEMS_FULL: NavItem[] = [
   { key: 'tasks', labelKey: 'nav.tasks', href: '/dashboard/tasks', icon: ClipboardList },
   { key: 'calendar', labelKey: 'nav.calendar', href: '/dashboard/calendar', icon: Calendar },
   { key: 'team', labelKey: 'nav.team', href: '/dashboard/team', icon: Users },
+  { key: 'incidents', labelKey: 'nav.incidents', href: '/dashboard/incidents', icon: AlertTriangle },
   { key: 'inventory', labelKey: 'nav.inventory', href: '/dashboard/inventory', icon: Package, v1Only: true },
   { key: 'billing', labelKey: 'nav.billing', href: '/dashboard/billing', icon: CreditCard },
   { key: 'settings', labelKey: 'nav.settings', href: '/dashboard/settings', icon: Settings },
@@ -74,7 +75,7 @@ function filterSidebarByRole(role: UserRole): NavItem[] {
     case 'staff_managed':
       return SIDEBAR_ITEMS_FULL.filter((item) => item.key === 'tasks')
     default:
-      return SIDEBAR_ITEMS_FULL
+      return SIDEBAR_ITEMS_FULL.filter((item) => item.key === 'dashboard')
   }
 }
 

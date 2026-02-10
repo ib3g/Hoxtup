@@ -12,7 +12,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, activeOrg } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
-  const initialSetDone = useRef(false)
+  const settingOrg = useRef(false)
+  const activeOrgRef = useRef(activeOrg)
+  activeOrgRef.current = activeOrg
+  const prevPathname = useRef(pathname)
+  const ready = useRef(false)
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -21,7 +25,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [isLoading, isAuthenticated, router])
 
   const verifyMembership = useCallback(async () => {
-    if (!isAuthenticated || isLoading) return
+    if (!isAuthenticated || isLoading || settingOrg.current) return
     try {
       const res = await authClient.organization.list()
       const orgs = res.data
@@ -29,38 +33,43 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         router.replace('/onboarding/organization')
         return
       }
-      if (!activeOrg) {
-        authClient.organization.setActive({ organizationId: orgs[0].id })
+      const currentOrg = activeOrgRef.current
+      if (!currentOrg) {
+        settingOrg.current = true
+        await authClient.organization.setActive({ organizationId: orgs[0].id })
+        settingOrg.current = false
       } else {
-        const stillMember = orgs.some((o: { id: string }) => o.id === activeOrg.id)
+        const stillMember = orgs.some((o: { id: string }) => o.id === currentOrg.id)
         if (!stillMember) {
-          authClient.organization.setActive({ organizationId: orgs[0].id })
+          settingOrg.current = true
+          await authClient.organization.setActive({ organizationId: orgs[0].id })
+          settingOrg.current = false
         }
       }
     } catch {
-      // network error — skip
+      settingOrg.current = false
     }
-  }, [isAuthenticated, isLoading, activeOrg, router])
+  }, [isAuthenticated, isLoading, router])
 
-  // Initial org setup on mount
-  useEffect(() => {
-    if (!isAuthenticated || isLoading || initialSetDone.current) return
-    initialSetDone.current = true
-    verifyMembership()
-  }, [isAuthenticated, isLoading, verifyMembership])
-
-  // Re-verify on every route change
+  // Single initial verification + periodic check
   useEffect(() => {
     if (!isAuthenticated || isLoading) return
-    verifyMembership()
-  }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Periodic check every 30s to catch removal without navigation
-  useEffect(() => {
-    if (!isAuthenticated || isLoading) return
+    if (!ready.current) {
+      ready.current = true
+      verifyMembership()
+    }
     const interval = setInterval(verifyMembership, MEMBERSHIP_CHECK_INTERVAL)
     return () => clearInterval(interval)
   }, [isAuthenticated, isLoading, verifyMembership])
+
+  // Re-verify only on actual route changes (not initial mount)
+  useEffect(() => {
+    if (!ready.current || !isAuthenticated || isLoading) return
+    if (pathname !== prevPathname.current) {
+      prevPathname.current = pathname
+      verifyMembership()
+    }
+  }, [pathname, isAuthenticated, isLoading, verifyMembership])
 
   if (isLoading) {
     return (

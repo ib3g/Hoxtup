@@ -64,16 +64,24 @@ export default function BillingPage() {
   }, [fetchBilling])
 
   // Poll after checkout redirect
+  const initialPlanRef = useRef<string | null>(null)
+
   useEffect(() => {
     if (searchParams.get('checkout') !== 'success') return
 
     let attempts = 0
-    const initialPlan = billing?.currentPlan
+
+    // Capture initial plan on first fetch if not already set
+    fetchBilling().then((data) => {
+      if (data && !initialPlanRef.current) {
+        initialPlanRef.current = data.currentPlan
+      }
+    })
 
     pollRef.current = setInterval(async () => {
       attempts++
       const data = await fetchBilling()
-      if (data && data.currentPlan !== initialPlan) {
+      if (data && initialPlanRef.current && data.currentPlan !== initialPlanRef.current) {
         toast.success(t('planUpdated'))
         if (pollRef.current) clearInterval(pollRef.current)
       }

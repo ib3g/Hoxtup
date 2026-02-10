@@ -137,7 +137,7 @@ function mapPolarStatus(status: string): 'TRIALING' | 'ACTIVE' | 'PAST_DUE' | 'C
     case 'canceled':
     case 'cancelled': return 'CANCELLED'
     case 'unpaid': return 'PAST_DUE'
-    default: return 'ACTIVE'
+    default: return 'PAST_DUE'
   }
 }
 

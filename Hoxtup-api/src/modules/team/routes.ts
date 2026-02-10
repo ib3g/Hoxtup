@@ -2,8 +2,10 @@ import { Router } from 'express'
 import { requireAuth, type AuthenticatedRequest } from '../../common/middleware/auth.js'
 import { requireRole, getActorMemberRole } from '../../common/middleware/permissions.js'
 import { prisma } from '../../config/database.js'
-import { listMembers, logAudit, listAuditLogs } from './service.js'
+import { listMembers, listAuditLogs } from './service.js'
 import { logger } from '../../config/logger.js'
+
+const VALID_ROLES = ['owner', 'admin', 'manager', 'member', 'staff_autonomous', 'staff_managed'] as const
 
 const router = Router()
 
@@ -29,8 +31,8 @@ router.patch('/:id/role', requireAuth, requireRole('owner', 'admin'), async (req
   const id = req.params.id as string
   const { role } = req.body as { role: string }
 
-  if (!role) {
-    res.status(400).json({ type: 'about:blank', title: 'Bad Request', status: 400, detail: 'role is required' })
+  if (!role || !VALID_ROLES.includes(role as typeof VALID_ROLES[number])) {
+    res.status(400).json({ type: 'about:blank', title: 'Bad Request', status: 400, detail: `role is required and must be one of: ${VALID_ROLES.join(', ')}` })
     return
   }
 
@@ -81,18 +83,24 @@ router.patch('/:id/role', requireAuth, requireRole('owner', 'admin'), async (req
           where: { id: actorMember.id, organizationId: authReq.organizationId },
           data: { role: 'admin' },
         }),
+        prisma.teamAuditLog.create({
+          data: { organizationId: authReq.organizationId, actorId: authReq.user.id, action: 'ownership_transfer', targetId: target.userId, details: `Transferred ownership to ${target.userId}` },
+        }),
       ])
-      await logAudit(prisma, authReq.organizationId, authReq.user.id, 'ownership_transfer', target.userId, `Transferred ownership to ${target.userId}`)
       res.json(updatedTarget)
       return
     }
 
-    const member = await prisma.member.update({
-      where: { id, organizationId: authReq.organizationId },
-      data: { role },
-      include: { user: { select: { id: true, name: true, email: true } } },
-    })
-    await logAudit(prisma, authReq.organizationId, authReq.user.id, 'role_change', target.userId, `Changed role from ${target.role} to ${role}`)
+    const [member] = await prisma.$transaction([
+      prisma.member.update({
+        where: { id, organizationId: authReq.organizationId },
+        data: { role },
+        include: { user: { select: { id: true, name: true, email: true } } },
+      }),
+      prisma.teamAuditLog.create({
+        data: { organizationId: authReq.organizationId, actorId: authReq.user.id, action: 'role_change', targetId: target.userId, details: `Changed role from ${target.role} to ${role}` },
+      }),
+    ])
     res.json(member)
   } catch (err) {
     logger.error({ err, id }, 'Failed to update member role')
@@ -131,10 +139,14 @@ router.delete('/:id', requireAuth, requireRole('owner', 'admin'), async (req, re
       return
     }
 
-    await prisma.member.delete({
-      where: { id, organizationId: authReq.organizationId },
-    })
-    await logAudit(prisma, authReq.organizationId, authReq.user.id, 'member_removed', target.userId, `Removed member (role: ${target.role})`)
+    await prisma.$transaction([
+      prisma.member.delete({
+        where: { id, organizationId: authReq.organizationId },
+      }),
+      prisma.teamAuditLog.create({
+        data: { organizationId: authReq.organizationId, actorId: authReq.user.id, action: 'member_removed', targetId: target.userId, details: `Removed member (role: ${target.role})` },
+      }),
+    ])
     res.status(204).end()
   } catch (err) {
     logger.error({ err, id }, 'Failed to remove member')
@@ -162,12 +174,16 @@ router.patch('/organization', requireAuth, requireRole('owner', 'admin'), async 
   }
 
   try {
-    const org = await prisma.organization.update({
-      where: { id: authReq.organizationId },
-      data,
-      select: { id: true, name: true, currencyCode: true, timezone: true, createdAt: true },
-    })
-    await logAudit(prisma, authReq.organizationId, authReq.user.id, 'org_updated', undefined, `Updated: ${Object.keys(data).join(', ')}`)
+    const [org] = await prisma.$transaction([
+      prisma.organization.update({
+        where: { id: authReq.organizationId },
+        data,
+        select: { id: true, name: true, currencyCode: true, timezone: true, createdAt: true },
+      }),
+      prisma.teamAuditLog.create({
+        data: { organizationId: authReq.organizationId, actorId: authReq.user.id, action: 'org_updated', details: `Updated: ${Object.keys(data).join(', ')}` },
+      }),
+    ])
     res.json(org)
   } catch (err) {
     logger.error({ err }, 'Failed to update organization')
@@ -177,8 +193,8 @@ router.patch('/organization', requireAuth, requireRole('owner', 'admin'), async 
 
 router.get('/audit-log', requireAuth, requireRole('owner', 'admin'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
-  const limit = Math.min(Number(req.query.limit) || 50, 100)
-  const offset = Number(req.query.offset) || 0
+  const limit = Math.max(1, Math.min(Number(req.query.limit) || 50, 100))
+  const offset = Math.max(0, Number(req.query.offset) || 0)
 
   try {
     const logs = await listAuditLogs(prisma, authReq.organizationId, limit, offset)

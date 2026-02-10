@@ -29,23 +29,26 @@ function AcceptInviteContent() {
   const [showLogin, setShowLogin] = useState(false)
   const acceptedRef = useRef(false)
 
+  const pendingRef = useRef(false)
+
   function doAccept() {
-    if (!invitationId || acceptedRef.current) return
-    acceptedRef.current = true
+    if (!invitationId || acceptedRef.current || pendingRef.current) return
+    pendingRef.current = true
     setStatus('accepting')
     authClient.organization.acceptInvitation({ invitationId })
       .then((res) => {
+        pendingRef.current = false
         if (res.error) {
-          acceptedRef.current = false
           setStatus('error')
           setErrorMessage(res.error.message ?? t('invite.error'))
         } else {
+          acceptedRef.current = true
           setStatus('success')
           setTimeout(() => router.push('/dashboard'), 2000)
         }
       })
       .catch(() => {
-        acceptedRef.current = false
+        pendingRef.current = false
         setStatus('error')
         setErrorMessage(t('invite.error'))
       })

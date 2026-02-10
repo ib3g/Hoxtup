@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { requireAuth, type AuthenticatedRequest } from '../../common/middleware/auth.js'
+import { requireRole } from '../../common/middleware/permissions.js'
 import { prisma } from '../../config/database.js'
 import { createICalSourceSchema } from './schema.js'
 import { createICalSource, listICalSources, deleteICalSource } from './service.js'
@@ -7,7 +8,7 @@ import { logger } from '../../config/logger.js'
 
 const router = Router({ mergeParams: true })
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requireRole('owner', 'admin', 'manager', 'member'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const propertyId = req.params.propertyId as string
 
@@ -25,7 +26,7 @@ router.get('/', requireAuth, async (req, res) => {
   }
 })
 
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, requireRole('owner', 'admin'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const propertyId = req.params.propertyId as string
 
@@ -66,7 +67,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 })
 
-router.delete('/:sourceId', requireAuth, async (req, res) => {
+router.delete('/:sourceId', requireAuth, requireRole('owner', 'admin'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const propertyId = req.params.propertyId as string
   const sourceId = req.params.sourceId as string

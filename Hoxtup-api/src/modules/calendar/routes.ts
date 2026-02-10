@@ -1,11 +1,12 @@
 import { Router } from 'express'
 import { requireAuth, type AuthenticatedRequest } from '../../common/middleware/auth.js'
+import { requireRole } from '../../common/middleware/permissions.js'
 import { prisma } from '../../config/database.js'
 import { logger } from '../../config/logger.js'
 
 const router = Router()
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requireRole('owner', 'admin', 'manager', 'member', 'staff_autonomous'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const start = req.query.start as string | undefined
   const end = req.query.end as string | undefined

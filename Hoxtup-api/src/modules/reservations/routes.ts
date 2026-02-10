@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { requireAuth, type AuthenticatedRequest } from '../../common/middleware/auth.js'
+import { requireRole } from '../../common/middleware/permissions.js'
 import { prisma } from '../../config/database.js'
 import { createReservationSchema, updateReservationSchema } from './schema.js'
 import { listReservations, getReservation, createReservation, updateReservation, cancelReservation } from './service.js'
@@ -7,7 +8,7 @@ import { logger } from '../../config/logger.js'
 
 const router = Router()
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requireRole('owner', 'admin', 'manager', 'member'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const propertyId = req.query.propertyId as string | undefined
   const status = req.query.status as string | undefined
@@ -26,7 +27,7 @@ router.get('/', requireAuth, async (req, res) => {
   }
 })
 
-router.get('/:id', requireAuth, async (req, res) => {
+router.get('/:id', requireAuth, requireRole('owner', 'admin', 'manager', 'member'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const id = req.params.id as string
 
@@ -55,7 +56,7 @@ router.get('/:id', requireAuth, async (req, res) => {
   }
 })
 
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, requireRole('owner', 'admin', 'manager', 'member'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
 
   const parsed = createReservationSchema.safeParse(req.body)
@@ -84,7 +85,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 })
 
-router.patch('/:id', requireAuth, async (req, res) => {
+router.patch('/:id', requireAuth, requireRole('owner', 'admin', 'manager', 'member'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const id = req.params.id as string
 
@@ -114,7 +115,7 @@ router.patch('/:id', requireAuth, async (req, res) => {
   }
 })
 
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, requireRole('owner', 'admin', 'manager', 'member'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const id = req.params.id as string
 

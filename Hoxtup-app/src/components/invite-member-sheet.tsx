@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner'
 import { authClient } from '@/lib/auth-client'
 
-type InviteRole = 'admin' | 'member' | 'owner'
+type InviteRole = 'admin' | 'member'
 const INVITE_ROLES: InviteRole[] = ['admin', 'member']
 
 interface InviteMemberSheetProps {

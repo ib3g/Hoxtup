@@ -16,7 +16,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 
-export type UserRole = 'owner' | 'admin' | 'manager' | 'staff_autonomous' | 'staff_managed'
+export type UserRole = 'owner' | 'admin' | 'manager' | 'member' | 'staff_autonomous' | 'staff_managed'
 
 export interface NavItem {
   key: string
@@ -63,6 +63,7 @@ function filterSidebarByRole(role: UserRole): NavItem[] {
     case 'admin':
       return SIDEBAR_ITEMS_FULL
     case 'manager':
+    case 'member':
       return SIDEBAR_ITEMS_FULL.filter(
         (item) => item.key !== 'billing' && item.key !== 'settings'
       )

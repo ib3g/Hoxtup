@@ -1,20 +1,11 @@
 import { Router } from 'express'
 import { requireAuth, type AuthenticatedRequest } from '../../common/middleware/auth.js'
+import { requireRole, getActorMemberRole } from '../../common/middleware/permissions.js'
 import { prisma } from '../../config/database.js'
-import { listMembers } from './service.js'
+import { listMembers, logAudit, listAuditLogs } from './service.js'
 import { logger } from '../../config/logger.js'
 
 const router = Router()
-
-const CAN_MANAGE_ROLES = ['owner', 'admin']
-
-async function getActorMemberRole(userId: string, organizationId: string): Promise<string | null> {
-  const member = await prisma.member.findFirst({
-    where: { userId, organizationId },
-    select: { role: true },
-  })
-  return member?.role ?? null
-}
 
 router.get('/', requireAuth, async (req, res) => {
   const authReq = req as AuthenticatedRequest
@@ -33,7 +24,7 @@ router.get('/', requireAuth, async (req, res) => {
   }
 })
 
-router.patch('/:id/role', requireAuth, async (req, res) => {
+router.patch('/:id/role', requireAuth, requireRole('owner', 'admin'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const id = req.params.id as string
   const { role } = req.body as { role: string }
@@ -44,12 +35,7 @@ router.patch('/:id/role', requireAuth, async (req, res) => {
   }
 
   try {
-    // Check actor permission
-    const actorRole = await getActorMemberRole(authReq.user.id, authReq.organizationId)
-    if (!actorRole || !CAN_MANAGE_ROLES.includes(actorRole)) {
-      res.status(403).json({ type: 'about:blank', title: 'Forbidden', status: 403, detail: 'Only owners and admins can change roles' })
-      return
-    }
+    const actorRole = authReq.memberRole!
 
     const target = await prisma.member.findUnique({ where: { id, organizationId: authReq.organizationId } })
     if (!target) {
@@ -75,11 +61,38 @@ router.patch('/:id/role', requireAuth, async (req, res) => {
       return
     }
 
+    // Ownership transfer: atomically promote target and demote current owner
+    if (role === 'owner') {
+      const actorMember = await prisma.member.findFirst({
+        where: { userId: authReq.user.id, organizationId: authReq.organizationId },
+      })
+      if (!actorMember) {
+        res.status(500).json({ type: 'about:blank', title: 'Internal Server Error', status: 500, detail: 'Actor member not found' })
+        return
+      }
+
+      const [updatedTarget] = await prisma.$transaction([
+        prisma.member.update({
+          where: { id, organizationId: authReq.organizationId },
+          data: { role: 'owner' },
+          include: { user: { select: { id: true, name: true, email: true } } },
+        }),
+        prisma.member.update({
+          where: { id: actorMember.id, organizationId: authReq.organizationId },
+          data: { role: 'admin' },
+        }),
+      ])
+      await logAudit(prisma, authReq.organizationId, authReq.user.id, 'ownership_transfer', target.userId, `Transferred ownership to ${target.userId}`)
+      res.json(updatedTarget)
+      return
+    }
+
     const member = await prisma.member.update({
       where: { id, organizationId: authReq.organizationId },
       data: { role },
       include: { user: { select: { id: true, name: true, email: true } } },
     })
+    await logAudit(prisma, authReq.organizationId, authReq.user.id, 'role_change', target.userId, `Changed role from ${target.role} to ${role}`)
     res.json(member)
   } catch (err) {
     logger.error({ err, id }, 'Failed to update member role')
@@ -87,17 +100,12 @@ router.patch('/:id/role', requireAuth, async (req, res) => {
   }
 })
 
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, requireRole('owner', 'admin'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const id = req.params.id as string
 
   try {
-    // Check actor permission
-    const actorRole = await getActorMemberRole(authReq.user.id, authReq.organizationId)
-    if (!actorRole || !CAN_MANAGE_ROLES.includes(actorRole)) {
-      res.status(403).json({ type: 'about:blank', title: 'Forbidden', status: 403, detail: 'Only owners and admins can remove members' })
-      return
-    }
+    const actorRole = authReq.memberRole!
 
     const target = await prisma.member.findUnique({ where: { id, organizationId: authReq.organizationId } })
     if (!target) {
@@ -126,6 +134,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
     await prisma.member.delete({
       where: { id, organizationId: authReq.organizationId },
     })
+    await logAudit(prisma, authReq.organizationId, authReq.user.id, 'member_removed', target.userId, `Removed member (role: ${target.role})`)
     res.status(204).end()
   } catch (err) {
     logger.error({ err, id }, 'Failed to remove member')
@@ -133,15 +142,8 @@ router.delete('/:id', requireAuth, async (req, res) => {
   }
 })
 
-router.patch('/organization', requireAuth, async (req, res) => {
+router.patch('/organization', requireAuth, requireRole('owner', 'admin'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
-
-  // Check actor permission via member role (not user role)
-  const actorRole = await getActorMemberRole(authReq.user.id, authReq.organizationId)
-  if (!actorRole || !CAN_MANAGE_ROLES.includes(actorRole)) {
-    res.status(403).json({ type: 'about:blank', title: 'Forbidden', status: 403, detail: 'Only owners and admins can update organization settings' })
-    return
-  }
 
   const { name, currencyCode } = req.body as { name?: string; currencyCode?: string }
 
@@ -165,10 +167,25 @@ router.patch('/organization', requireAuth, async (req, res) => {
       data,
       select: { id: true, name: true, currencyCode: true, timezone: true, createdAt: true },
     })
+    await logAudit(prisma, authReq.organizationId, authReq.user.id, 'org_updated', undefined, `Updated: ${Object.keys(data).join(', ')}`)
     res.json(org)
   } catch (err) {
     logger.error({ err }, 'Failed to update organization')
     res.status(500).json({ type: 'about:blank', title: 'Internal Server Error', status: 500, detail: 'Failed to update organization' })
+  }
+})
+
+router.get('/audit-log', requireAuth, requireRole('owner', 'admin'), async (req, res) => {
+  const authReq = req as AuthenticatedRequest
+  const limit = Math.min(Number(req.query.limit) || 50, 100)
+  const offset = Number(req.query.offset) || 0
+
+  try {
+    const logs = await listAuditLogs(prisma, authReq.organizationId, limit, offset)
+    res.json(logs)
+  } catch (err) {
+    logger.error({ err }, 'Failed to list audit logs')
+    res.status(500).json({ type: 'about:blank', title: 'Internal Server Error', status: 500, detail: 'Failed to list audit logs' })
   }
 })
 

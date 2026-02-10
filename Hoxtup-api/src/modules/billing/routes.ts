@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { requireAuth, type AuthenticatedRequest } from '../../common/middleware/auth.js'
+import { requireRole } from '../../common/middleware/permissions.js'
 import { prisma } from '../../config/database.js'
 import { logger } from '../../config/logger.js'
 import { PLANS } from '../../config/plans.js'
@@ -15,7 +16,7 @@ import type { PlanTier } from '../../generated/prisma/client.js'
 
 const router = Router()
 
-router.get('/plans', requireAuth, async (_req, res) => {
+router.get('/plans', requireAuth, requireRole('owner', 'admin'), async (_req, res) => {
   const plansList = Object.values(PLANS).map((p) => ({
     id: p.tier.toLowerCase(),
     name: p.tier.charAt(0) + p.tier.slice(1).toLowerCase(),
@@ -28,7 +29,7 @@ router.get('/plans', requireAuth, async (_req, res) => {
   res.json(plansList)
 })
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requireRole('owner', 'admin'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
 
   try {
@@ -66,7 +67,7 @@ router.get('/', requireAuth, async (req, res) => {
   }
 })
 
-router.post('/checkout', requireAuth, async (req, res) => {
+router.post('/checkout', requireAuth, requireRole('owner', 'admin'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const { planTier } = req.body as { planTier?: string }
 
@@ -115,7 +116,7 @@ router.post('/checkout', requireAuth, async (req, res) => {
   }
 })
 
-router.post('/cancel', requireAuth, async (req, res) => {
+router.post('/cancel', requireAuth, requireRole('owner', 'admin'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
 
   try {

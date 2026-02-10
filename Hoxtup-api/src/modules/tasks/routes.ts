@@ -1,13 +1,17 @@
 import { Router } from 'express'
 import { requireAuth, type AuthenticatedRequest } from '../../common/middleware/auth.js'
+import { requireRole, getActorMemberRole } from '../../common/middleware/permissions.js'
 import { prisma } from '../../config/database.js'
 import { createTaskSchema, updateTaskSchema } from './schema.js'
 import { listTasks, getTask, createTask, updateTask } from './service.js'
 import { logger } from '../../config/logger.js'
 
+const CAN_FULL_EDIT = ['owner', 'admin', 'manager']
+const STAFF_ROLES = ['member', 'staff_autonomous', 'staff_managed']
+
 const router = Router()
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requireRole('owner', 'admin', 'manager', 'member', 'staff_autonomous'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const propertyId = req.query.propertyId as string | undefined
   const status = req.query.status as string | undefined
@@ -61,6 +65,18 @@ router.get('/:id', requireAuth, async (req, res) => {
       return
     }
 
+    // staff_managed can only view tasks assigned to them
+    const role = await getActorMemberRole(authReq.user.id, authReq.organizationId)
+    if (role === 'staff_managed' && task.assignedUserId !== authReq.user.id) {
+      res.status(403).json({
+        type: 'about:blank',
+        title: 'Forbidden',
+        status: 403,
+        detail: 'You can only view tasks assigned to you',
+      })
+      return
+    }
+
     res.json(task)
   } catch (err) {
     logger.error({ err, id }, 'Failed to get task')
@@ -73,7 +89,7 @@ router.get('/:id', requireAuth, async (req, res) => {
   }
 })
 
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, requireRole('owner', 'admin', 'manager'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
 
   const parsed = createTaskSchema.safeParse(req.body)
@@ -119,6 +135,41 @@ router.patch('/:id', requireAuth, async (req, res) => {
   }
 
   try {
+    const role = await getActorMemberRole(authReq.user.id, authReq.organizationId)
+    if (!role) {
+      res.status(403).json({ type: 'about:blank', title: 'Forbidden', status: 403, detail: 'Not a member of this organization' })
+      return
+    }
+
+    // Staff roles can only update status/note on their own assigned tasks
+    if (STAFF_ROLES.includes(role)) {
+      const current = await getTask(prisma, authReq.organizationId, id)
+      if (!current || current.assignedUserId !== authReq.user.id) {
+        res.status(403).json({
+          type: 'about:blank',
+          title: 'Forbidden',
+          status: 403,
+          detail: 'You can only update tasks assigned to you',
+        })
+        return
+      }
+
+      const allowedFields = ['status', 'note']
+      const hasDisallowedFields = Object.keys(parsed.data).some((k) => !allowedFields.includes(k))
+      if (hasDisallowedFields) {
+        res.status(403).json({
+          type: 'about:blank',
+          title: 'Forbidden',
+          status: 403,
+          detail: 'You can only update the status and note of your assigned tasks',
+        })
+        return
+      }
+    } else if (!CAN_FULL_EDIT.includes(role)) {
+      res.status(403).json({ type: 'about:blank', title: 'Forbidden', status: 403, detail: 'You do not have permission to perform this action' })
+      return
+    }
+
     const task = await updateTask(prisma, authReq.organizationId, id, parsed.data, authReq.user.id)
     res.json(task)
   } catch (err) {
@@ -132,7 +183,7 @@ router.patch('/:id', requireAuth, async (req, res) => {
   }
 })
 
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, requireRole('owner', 'admin', 'manager'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const id = req.params.id as string
 

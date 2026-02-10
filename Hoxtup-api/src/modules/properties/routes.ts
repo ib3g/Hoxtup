@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { requireAuth, type AuthenticatedRequest } from '../../common/middleware/auth.js'
+import { requireRole } from '../../common/middleware/permissions.js'
 import { prisma } from '../../config/database.js'
 import { createPropertySchema, updatePropertySchema } from './schema.js'
 import { createProperty, listProperties, getProperty, updateProperty, archiveProperty, reactivateProperty } from './service.js'
@@ -7,7 +8,7 @@ import { logger } from '../../config/logger.js'
 
 const router = Router()
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requireRole('owner', 'admin', 'manager', 'member'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
 
   try {
@@ -24,7 +25,7 @@ router.get('/', requireAuth, async (req, res) => {
   }
 })
 
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, requireRole('owner', 'admin'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
 
   const parsed = createPropertySchema.safeParse(req.body)
@@ -54,7 +55,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 })
 
-router.get('/:id', requireAuth, async (req, res) => {
+router.get('/:id', requireAuth, requireRole('owner', 'admin', 'manager', 'member'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const id = req.params.id as string
 
@@ -83,7 +84,7 @@ router.get('/:id', requireAuth, async (req, res) => {
   }
 })
 
-router.patch('/:id', requireAuth, async (req, res) => {
+router.patch('/:id', requireAuth, requireRole('owner', 'admin'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const id = req.params.id as string
 
@@ -113,7 +114,7 @@ router.patch('/:id', requireAuth, async (req, res) => {
   }
 })
 
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, requireRole('owner', 'admin'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const id = req.params.id as string
 
@@ -131,7 +132,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
   }
 })
 
-router.patch('/:id/reactivate', requireAuth, async (req, res) => {
+router.patch('/:id/reactivate', requireAuth, requireRole('owner', 'admin'), async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const id = req.params.id as string
 

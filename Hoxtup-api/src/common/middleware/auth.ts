@@ -12,6 +12,7 @@ export interface AuthenticatedRequest extends Request {
   }
   organizationId: string
   sessionId: string
+  memberRole?: string
 }
 
 export async function requireAuth(req: Request, res: Response, next: NextFunction) {

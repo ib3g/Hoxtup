@@ -151,7 +151,6 @@ export function TaskDetailSheet({ taskId, open, onOpenChange, onTaskUpdated }: T
     if (res.ok) {
       const updated = await res.json()
       setTask(updated)
-      setAssignOpen(false)
       toast.success(`${t('assigned')} → ${userName}`)
       onTaskUpdated?.()
     }

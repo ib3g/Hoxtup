@@ -12,6 +12,7 @@ import 'dotenv/config'
 import { PrismaClient, Role } from '../src/generated/prisma/client.js'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { randomUUID } from 'node:crypto'
+import { hashPassword } from 'better-auth/crypto'
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! })
 const prisma = new PrismaClient({ adapter })
@@ -117,17 +118,7 @@ async function main() {
     })
 
     if (seedUser.hasAccount) {
-      // Better Auth expects an Account entry with providerId = 'credential'
-      // and the password stored in the 'password' field (hashed by Better Auth
-      // at runtime). For seeding, we store a bcrypt-compatible hash.
-      // NOTE: When the auth module is implemented, replace this with a call
-      // to the Better Auth sign-up API for proper hashing.
-      const { hash } = await import('@node-rs/argon2').catch(() => {
-        // Fallback: store plaintext marker so we know to re-hash on first login
-        return { hash: async (pw: string) => `$seed$${pw}` }
-      })
-
-      const hashedPassword = await hash(DEMO_PASSWORD)
+      const hashedPassword = await hashPassword(DEMO_PASSWORD)
 
       await prisma.account.create({
         data: {
